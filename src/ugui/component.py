@@ -375,7 +375,7 @@ class NavBar(Component):
         .nav-item:hover { color: #0066cc; }
         .nav-icon {
             width: 0.8rem;
-            height: 1.75rem;
+            height: 1.2rem;
         }
         """
 
@@ -396,7 +396,7 @@ class NavItem(Component):
 
         # Handle icon (either raw icon or material icon)
         if material_icon:
-            icon_component = MaterialIcon(name=material_icon, size="1rem")
+            icon_component = MaterialIcon(name=material_icon, size="1.2rem")
             icon_span = Element("span", cls="nav-icon")
             icon_span.append(icon_component)
             a.append(icon_span)
