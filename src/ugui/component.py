@@ -39,24 +39,48 @@ from .component import Component
 class Card(Component):
     def __init__(self, **props):
         super().__init__("div", cls=f"card {props.get('class', '')}".strip(), **props)
-        if self.props.get("title"):
-            header = Element("div", cls="card-header")
-            header.append(self.props["title"])
-            self.append(header)
 
-        body = Element("div", cls="card-body")
+        # Initialize section elements
+        self._header = Element("div", cls="card-header")
+        self._body = Element("div", cls="card-body")
+        self._footer = Element("div", cls="card-footer")
+
+        # Add default contents if provided
+        if self.props.get("title"):
+            self._header.append(self.props["title"])
+            self.append(self._header)
+
+        # Handle body contents
         contents = self.props.get("contents", [])
         if isinstance(contents, (list, tuple)):
             for content in contents:
-                body.append(content)
+                self._body.append(content)
         else:
-            body.append(contents)
-        self.append(body)
+            self._body.append(contents)
+        self.append(self._body)
 
         if self.props.get("footer"):
-            footer = Element("div", cls="card-footer")
-            footer.append(self.props["footer"])
-            self.append(footer)
+            self._footer.append(self.props["footer"])
+            self.append(self._footer)
+
+    def header(self):
+        """Access the card header section"""
+        if self._header not in self.children:
+            self.children.insert(0, self._header)
+        self._header._page = self._page
+        return self._header
+
+    def body(self):
+        """Access the card body section"""
+        self._body._page = self._page
+        return self._body
+
+    def footer(self):
+        """Access the card footer section"""
+        if self._footer not in self.children:
+            self.append(self._footer)
+        self._footer._page = self._page
+        return self._footer
 
     def style(self) -> str:
         return """
@@ -335,26 +359,36 @@ class NavItem(Component):
 
 class Hero(Component):
     def __init__(self, **props):
-        super().__init__("div", cls="hero", **props)
-        if self.props.get("title"):
-            h1 = Element("h1", cls="hero-title")
-            h1.append(self.props["title"])
-            self.append(h1)
+        super().__init__("div", cls=f"hero {props.get('class', '')}".strip(), **props)
+        # Initialize section elements
+        self._title = Element("h1", cls="hero-title")
+        self._subtitle = Element("p", cls="hero-subtitle")
+        self._content = Element("div", cls="hero-actions")
 
-        if self.props.get("subtitle"):
-            p = Element("p", cls="hero-subtitle")
-            p.append(self.props["subtitle"])
-            self.append(p)
+    def title(self, text=None):
+        """Set or access the hero title"""
+        if text is not None:
+            self._title.children = []
+            self._title.append(text)
+            if self._title not in self.children:
+                self.append(self._title)
+        return self._title
 
-        contents = self.props.get("contents", [])
-        if contents:
-            actions = Element("div", cls="hero-actions")
-            if isinstance(contents, (list, tuple)):
-                for content in contents:
-                    actions.append(content)
-            else:
-                actions.append(contents)
-            self.append(actions)
+    def subtitle(self, text=None):
+        """Set or access the hero subtitle"""
+        if text is not None:
+            self._subtitle.children = []
+            self._subtitle.append(text)
+            if self._subtitle not in self.children:
+                self.append(self._subtitle)
+        return self._subtitle
+
+    def content(self):
+        """Access the hero content section"""
+        if self._content not in self.children:
+            self.append(self._content)
+        self._content._page = self._page
+        return self._content
 
     def style(self) -> str:
         return """
