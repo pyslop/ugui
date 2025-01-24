@@ -1,7 +1,7 @@
 from .html import defaults
 import warnings
 from typing import List, Optional, Union
-from .components import CARD_CSS, FORM_CSS, BUTTON_CSS, BASE_CSS
+from .component import BASE_CSS, Card, Form, Button, Fieldset, Field
 from .css import CSSRegistry
 
 
@@ -153,59 +153,44 @@ class PageUI:
         self._page = page
         self._initialized_components = set()
 
-    def _init_component(self, name: str, css: str) -> None:
+    def _init_component(self, component: "Component") -> None:
         """Initialize component CSS if not already done"""
-        if name not in self._initialized_components:
-            self._page.style(css)
-            self._initialized_components.add(name)
+        component_name = component.__class__.__name__
+        if component_name not in self._initialized_components:
+            self._page.style(component.style())
+            self._initialized_components.add(component_name)
 
-    def card(self, *contents, title=None, footer=None, cls="card", **attrs):
-        """Create a card component with optional title and footer"""
-        self._init_component("card", CARD_CSS)
-        attrs["class"] = f"{cls} {attrs.get('class', '')}"
-        with self._page.div(**attrs) as card:
-            if title:
-                self._page.div(title, cls="card-header")
-            with self._page.div(cls="card-body"):
-                for content in contents:
-                    self._page.append(content)
-            if footer:
-                self._page.div(footer, cls="card-footer")
-        return card
+    def card(self, *contents, **kwargs):
+        """Create a card component"""
+        component = Card(contents=contents, **kwargs)
+        self._init_component(component)
+        return component(self._page)
 
-    def form(self, *contents, action="#", method="post", **attrs):
-        """Create a form with specified action and method"""
-        self._init_component("form", FORM_CSS)
-        attrs.update(action=action, method=method)
-        with self._page.form(**attrs) as form:
-            for content in contents:
-                self._page.append(content)
-        return form
+    def form(self, *contents, **kwargs):
+        """Create a form component"""
+        component = Form(contents=contents, **kwargs)
+        self._init_component(component)
+        return component(self._page)
 
-    def fieldset(self, *contents, legend=None, **attrs):
-        """Create a fieldset with optional legend"""
-        with self._page.fieldset(**attrs) as fs:
-            if legend:
-                self._page.legend(legend)
-            for content in contents:
-                self._page.append(content)
-        return fs
+    def button(self, text, **kwargs):
+        """Create a button component"""
+        component = Button(text=text, **kwargs)
+        self._init_component(component)
+        return component(self._page)
 
-    def field(self, label, input_type="text", name=None, **attrs):
-        """Create a labeled form field"""
-        field_id = attrs.pop("id", name or f"field_{input_type}_{id(label)}")
-        with self._page.div(cls="form-field") as container:
-            self._page.label(label, for_=field_id)
-            self._page.input(
-                type=input_type, id=field_id, name=name or field_id, **attrs
-            )
-        return container
+    def fieldset(self, *contents, **kwargs):
+        """Create a fieldset component"""
+        component = Fieldset(contents=contents, **kwargs)
+        self._init_component(component)
+        return component(self._page)
 
-    def button(self, text, **attrs):
-        """Create a styled button"""
-        self._init_component("button", BUTTON_CSS)
-        cls = f"btn {attrs.pop('cls', '')}"
-        return self._page.button(text, cls=cls.strip(), **attrs)
+    def field(self, label, **kwargs):
+        """Create a form field component"""
+        component = Field(label=label, **kwargs)
+        self._init_component(component)
+        return component(self._page)
+
+    # Fieldset and field methods can be converted similarly
 
 
 class Page:
