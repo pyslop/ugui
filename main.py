@@ -11,15 +11,29 @@ def index(page: Page):
         page.meta(name="viewport", content="width=device-width, initial-scale=1")
 
     with page.body():
-        with page.nav():
-            page.a("µGUI", href="/")
+        # Navigation using new nav components
+        with page.ui.navbar():
+            page.ui.nav_item("Home", "/", icon="🏠")
+            page.ui.nav_item("Docs", "/docs", icon="📚")
 
-        with page.div(cls="hero"):
-            page.h1("µGUI Framework")
-            page.p("A lightweight Python web framework for building UIs")
-            with page.div():
-                page.a("Get Started", href="#", cls="btn")
-                page.a("Learn More", href="#", cls="btn secondary")
+        page.ui.button("Click me", cls="primary")
+
+        # # Example usage
+        # with page.ui.navbar(direction="row"):  # Default horizontal layout
+        #     page.ui.nav_item(label="Home", url="/", icon="🏠")
+        #     page.ui.nav_item(label="About", url="/about")
+
+        # with page.ui.navbar(direction="column"):  # Vertical layout
+        #     page.ui.nav_item("Home", "/", icon="🏠")
+        #     page.ui.nav_item("About", "/about")
+
+        # Hero section using new hero component
+        with page.ui.hero(
+            title="µGUI Framework",
+            subtitle="A lightweight Python web framework for building UIs",
+        ):
+            page.ui.button("Get Started", href="#", cls="primary")
+            page.ui.button("Learn More", href="#", cls="secondary")
 
         with page.div(cls="features"):
             for title, desc in [
@@ -53,10 +67,9 @@ def index(page: Page):
 
             with page.ui.form(action="/login"):
                 with page.ui.fieldset(legend="Login Details"):
-                    page.ui.field("Username", name="username"),
-                    page.ui.field("Password", input_type="password", name="password"),
-
-                page.button("Submit", type="submit", cls="btn")
+                    page.ui.field("Username", name="username")
+                    page.ui.field("Password", input_type="password", name="password")
+                page.ui.button("Submit", type="submit")
 
 
 app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=True)

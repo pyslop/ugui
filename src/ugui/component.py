@@ -1,30 +1,63 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Optional
+from .html import Element
 
 
-class Component(ABC):
-    def __init__(self, **props):
+class Component(Element):
+    def __init__(self, _name: str = "div", **props):
+        super().__init__(
+            _name, **{k: v for k, v in props.items() if k not in ["contents"]}
+        )
         self.props = props
+
+        # Initialize component styles
+        contents = props.get("contents", [])
+        if isinstance(contents, (list, tuple)):
+            for content in contents:
+                if content is not None:
+                    self.append(content)
+        elif contents is not None:
+            self.append(contents)
 
     @abstractmethod
     def style(self) -> str:
         """Return the CSS for this component"""
         pass
 
-    @abstractmethod
-    def render(self, page: Any) -> Any:
-        """Render the component using the page object"""
-        pass
-
     def __call__(self, page: Any) -> Any:
-        """Make components callable for convenience"""
-        return self.render(page)
+        """Make components callable for page context"""
+        self._page = page
+        if hasattr(page, "_current"):
+            self.parent = page._current
+            page._current.append(self)
+        return self
 
 
 from .component import Component
 
 
 class Card(Component):
+    def __init__(self, **props):
+        super().__init__("div", cls=f"card {props.get('class', '')}".strip(), **props)
+        if self.props.get("title"):
+            header = Element("div", cls="card-header")
+            header.append(self.props["title"])
+            self.append(header)
+
+        body = Element("div", cls="card-body")
+        contents = self.props.get("contents", [])
+        if isinstance(contents, (list, tuple)):
+            for content in contents:
+                body.append(content)
+        else:
+            body.append(contents)
+        self.append(body)
+
+        if self.props.get("footer"):
+            footer = Element("div", cls="card-footer")
+            footer.append(self.props["footer"])
+            self.append(footer)
+
     def style(self) -> str:
         return """
         .card {
@@ -49,27 +82,24 @@ class Card(Component):
         }
         """
 
-    def render(self, page):
-        contents = self.props.get("contents", [])
-        title = self.props.get("title")
-        footer = self.props.get("footer")
-        cls = f"card {self.props.get('class', '')}"
-
-        with page.div(cls=cls.strip()) as card:
-            if title:
-                page.div(title, cls="card-header")
-            with page.div(cls="card-body"):
-                if isinstance(contents, (list, tuple)):
-                    for content in contents:
-                        page._current.append(content)
-                else:
-                    page._current.append(contents)
-            if footer:
-                page.div(footer, cls="card-footer")
-        return card
-
 
 class Form(Component):
+    def __init__(self, **props):
+        # Extract form-specific props
+        action = props.pop("action", "#")
+        method = props.pop("method", "post")
+
+        # Initialize with form attributes
+        super().__init__("form", action=action, method=method, **props)
+
+        # Handle contents after initialization
+        contents = props.get("contents", [])
+        if isinstance(contents, (list, tuple)):
+            for content in contents:
+                self.append(content)
+        else:
+            self.append(contents)
+
     def style(self) -> str:
         return """
         .form-field {
@@ -91,21 +121,19 @@ class Form(Component):
         form { width: 100%; }
         """
 
-    def render(self, page):
-        action = self.props.get("action", "#")
-        method = self.props.get("method", "post")
-        contents = self.props.get("contents", [])
-
-        with page.form(action=action, method=method) as form:
-            if isinstance(contents, (list, tuple)):
-                for content in contents:
-                    page._current.append(content)
-            else:
-                page._current.append(contents)
-        return form
-
 
 class Button(Component):
+    def __init__(self, **props):
+        # Extract and combine class names first
+        cls = f"btn {props.pop('class', '')} {props.pop('cls', '')}".strip()
+        text = props.pop("text", "")
+
+        # Initialize with combined class and remaining props
+        super().__init__("button", cls=cls, **props)
+
+        if text:
+            self.append(text)
+
     def style(self) -> str:
         return """
         .btn {
@@ -124,14 +152,29 @@ class Button(Component):
         }
         """
 
-    def render(self, page):
-        text = self.props.get("text", "")
-        cls = f"btn {self.props.get('class', '')}"
-        props = {k: v for k, v in self.props.items() if k not in ["text", "class"]}
-        return page.button(text, cls=cls.strip(), **props)
-
 
 class Fieldset(Component):
+    def __init__(self, **props):
+        # Extract fieldset-specific props
+        legend = props.pop("legend", None)
+
+        # Initialize with remaining props
+        super().__init__("fieldset", **props)
+
+        # Add legend if provided
+        if legend:
+            legend_elem = Element("legend")
+            legend_elem.append(legend)
+            self.append(legend_elem)
+
+        # Handle contents after initialization
+        contents = props.get("contents", [])
+        if isinstance(contents, (list, tuple)):
+            for content in contents:
+                self.append(content)
+        else:
+            self.append(contents)
+
     def style(self) -> str:
         return """
         fieldset {
@@ -146,20 +189,33 @@ class Fieldset(Component):
         }
         """
 
-    def render(self, page):
-        legend = self.props.get("legend")
-        contents = self.props.get("contents", [])
-        attrs = {k: v for k, v in self.props.items() if k not in ["legend", "contents"]}
-
-        with page.fieldset(**attrs) as fs:
-            if legend:
-                page.legend(legend)
-            for content in contents:
-                page.append(content)
-        return fs
-
 
 class Field(Component):
+    def __init__(self, **props):
+        super().__init__("div", cls="form-field", **props)
+        label_text = self.props.get("label")
+        input_type = self.props.get("input_type", "text")
+        name = self.props.get("name")
+        field_id = self.props.get("id", name or f"field_{input_type}_{id(label_text)}")
+
+        attrs = {
+            k: v
+            for k, v in self.props.items()
+            if k not in ["label", "input_type", "name", "id"]
+        }
+
+        # Create and append label element
+        label = Element("label", for_=field_id)
+        label.append(label_text)
+        self.append(label)
+
+        # Create and append input element
+        self.append(
+            Element(
+                "input", type=input_type, id=field_id, name=name or field_id, **attrs
+            )
+        )
+
     def style(self) -> str:
         return """
         .form-field {
@@ -180,22 +236,119 @@ class Field(Component):
         }
         """
 
-    def render(self, page):
-        label_text = self.props.get("label")
-        input_type = self.props.get("input_type", "text")
-        name = self.props.get("name")
-        field_id = self.props.get("id", name or f"field_{input_type}_{id(label_text)}")
 
-        attrs = {
-            k: v
-            for k, v in self.props.items()
-            if k not in ["label", "input_type", "name", "id"]
+class NavBar(Component):
+    def __init__(self, **props):
+        super().__init__("nav", cls="nav", **props)
+        ul = Element("ul", cls="nav-items")
+        contents = self.props.get("contents", [])
+        if isinstance(contents, (list, tuple)):
+            for content in contents:
+                ul.append(content)
+        else:
+            ul.append(contents)
+        self.append(ul)
+
+    def style(self) -> str:
+        return """
+        .nav {
+            width: 100%;
+            padding: 1rem;
+            background: #fff;
+            border-bottom: 1px solid #eee;
         }
+        .nav-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .nav-item {
+            text-decoration: none;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .nav-item:hover {
+            color: #0066cc;
+        }
+        .nav-icon {
+            width: 1em;
+            height: 1em;
+        }
+        """
 
-        with page.div(cls="form-field") as container:
-            page.label(label_text, for_=field_id)
-            page.input(type=input_type, id=field_id, name=name or field_id, **attrs)
-        return container
+
+class NavItem(Component):
+    def __init__(self, **props):
+        super().__init__("li", **props)
+        label = self.props.get("label")
+        url = self.props.get("url", "#")
+        icon = self.props.get("icon")
+
+        a = Element("a", href=url, cls="nav-item")
+        if icon:
+            icon_span = Element("span", cls="nav-icon")
+            icon_span.append(icon)
+            a.append(icon_span)
+
+        label_span = Element("span")
+        label_span.append(label)
+        a.append(label_span)
+        self.append(a)
+
+    def style(self) -> str:
+        return ""  # Uses nav styles
+
+
+class Hero(Component):
+    def __init__(self, **props):
+        super().__init__("div", cls="hero", **props)
+        if self.props.get("title"):
+            h1 = Element("h1", cls="hero-title")
+            h1.append(self.props["title"])
+            self.append(h1)
+
+        if self.props.get("subtitle"):
+            p = Element("p", cls="hero-subtitle")
+            p.append(self.props["subtitle"])
+            self.append(p)
+
+        contents = self.props.get("contents", [])
+        if contents:
+            actions = Element("div", cls="hero-actions")
+            if isinstance(contents, (list, tuple)):
+                for content in contents:
+                    actions.append(content)
+            else:
+                actions.append(contents)
+            self.append(actions)
+
+    def style(self) -> str:
+        return """
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: #f8f9fa;
+            margin: 0;
+        }
+        .hero-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        """
 
 
 # Keep BASE_CSS for page-wide styles
@@ -215,8 +368,8 @@ body {
     overflow-x: hidden;
 }
 
-nav { margin-bottom: 2rem; }
-.hero { margin: 2rem 0; text-align: center; }
+a { color: #0066cc; }
+
 .features { 
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -224,7 +377,7 @@ nav { margin-bottom: 2rem; }
     margin: 2rem 0;
 }
 .feature { padding: 1rem; }
-a { color: #0066cc; }
+
 .container {
     width: 100%;
     max-width: 600px;

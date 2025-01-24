@@ -1,3 +1,8 @@
+from typing import List, Optional, Union
+import warnings
+from .css import CSSRegistry
+
+
 class defaults:
     remove_first_underscore = True
     replace_single_underscore = False
@@ -170,3 +175,174 @@ class defaults:
         "tt",
         "xmp",
     }
+
+
+class Node:
+    def __init__(self):
+        self.parent: Optional[Node] = None
+        self.children: List[Node] = []
+
+    def append(self, child: "Node") -> "Node":
+        if isinstance(child, str):
+            child = TextNode(child)
+        child.parent = self
+        self.children.append(child)
+        return self
+
+    def render(
+        self, indent: int = 0, indent_size: int = 2, minify: bool = False
+    ) -> str:
+        parts = []
+        for child in self.children:
+            parts.append(child.render(indent, indent_size, minify))
+        return "".join(parts)
+
+
+class TextNode(Node):
+    def __init__(self, text: str, raw: bool = False):
+        super().__init__()
+        self.text = text
+        self.raw = raw
+
+    def render(
+        self, indent: int = 0, indent_size: int = 2, minify: bool = False
+    ) -> str:
+        text = self.text if self.raw else str(self.text)
+        if not text.strip() or minify:
+            return text
+        return " " * indent + text
+
+
+class Element(Node):
+    def __init__(self, _name: str, **attrs):
+        super().__init__()
+        self._name = _name.lower()
+
+        # Validate tag
+        if self._name in defaults.deprecated_tags:
+            warnings.warn(
+                f"The {self._name!r} tag is deprecated. "
+                "See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element"
+            )
+        if self._name not in defaults.tags and self._name not in defaults.void_tags:
+            warnings.warn(f"Unknown tag {self._name!r}")
+
+        # Fix attribute names
+        self.attrs = {}
+        for k, v in attrs.items():
+            if k == "cls" or k == "className":
+                k = "class"
+            elif "__" in k:
+                k = k.replace("__", "-")
+            self.attrs[k] = v
+
+        self._page = None
+
+        if _name == "style":
+            # Get document root
+            root = self
+            while root.parent:
+                root = root.parent
+            if isinstance(root, Document):
+                root.styles.add(attrs.get("content", ""))
+
+    def validate_content(self, content: any) -> bool:
+        """Validate content can be added to this element"""
+        if content is None:
+            return False
+        if isinstance(content, (str, Element, Document, TextNode)):  # Added TextNode
+            return True
+        raise TypeError(
+            f"Invalid content for {self._name!r}: {content!r}, "
+            "expected str, Element, Document or TextNode"
+        )
+
+    def append(self, child: Union[Node, str]) -> None:
+        if isinstance(child, str) and self._name == "style":
+            # Add style content to document styles
+            root = self
+            while root.parent:
+                root = root.parent
+            if isinstance(root, Document):
+                root.styles.add(child)
+        else:
+            super().append(child)
+
+    def render(
+        self, indent: int = 0, indent_size: int = 2, minify: bool = False
+    ) -> str:
+        attrs = "".join(
+            f' {k}="{v}"' for k, v in self.attrs.items() if not isinstance(v, bool)
+        )
+        attrs += "".join(f" {k}" for k, v in self.attrs.items() if isinstance(v, bool))
+
+        if minify:
+            if self._name.lower() in defaults.void_tags:
+                return f"<{self._name}{attrs}/>"
+            content = super().render(0, 0, True)
+            return f"<{self._name}{attrs}>{content}</{self._name}>"
+
+        spaces = " " * indent
+        if self._name.lower() in defaults.void_tags:
+            return f"{spaces}<{self._name}{attrs}/>\n"
+
+        content = super().render(indent + indent_size, indent_size, minify)
+        if not content.strip():
+            return f"{spaces}<{self._name}{attrs}></{self._name}>\n"
+
+        return f"{spaces}<{self._name}{attrs}>\n{content}{spaces}</{self._name}>\n"
+
+    def __enter__(self):
+        if self._page:
+            self._page._current = self
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self._page and self._page._current == self:
+            self._page._current = self.parent
+
+
+class Document(Node):
+    def __init__(self, minify=True, indent_size: int = 2):
+        super().__init__()
+        self.doctype = "html"
+        self.lang = "en"
+        self.styles = CSSRegistry()
+        self.minify = minify
+        self.indent_size = indent_size
+
+    def collect_styles(self) -> str:
+        """Collect all styles and render them"""
+        if not self.styles._styles:
+            return ""
+        styles = self.styles.render(minify=self.minify)
+        if self.minify:
+            return f"<style>{styles}</style>"
+        return f"<style>\n  {styles}\n</style>"
+
+    def render(self) -> str:
+        # Find or create head element
+        head = next(
+            (
+                child
+                for child in self.children
+                if isinstance(child, Element) and child._name == "head"
+            ),
+            None,
+        )
+        if not head:
+            head = Element("head")
+            self.children.insert(0, head)
+
+        # Insert styles at start of head
+        # styles = self.collect_styles()
+        # if styles:
+        #     head.children.insert(0, TextNode(styles, raw=True))
+
+        if self.minify:
+            html = f"<!DOCTYPE {self.doctype}><html lang='{self.lang}'>"
+            return html + super().render(0, 0, True) + "</html>"
+
+        html = f"<!DOCTYPE {self.doctype}>\n<html lang='{self.lang}'>\n"
+        content = super().render(self.indent_size, self.indent_size, False)
+        return html + content + "</html>\n"
