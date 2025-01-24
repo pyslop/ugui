@@ -5,13 +5,13 @@ from .material_icon import MaterialIcon
 class Button(Component):
     def __init__(self, **props):
         # Extract and combine class names first
-        cls = f"btn {props.pop('class', '')} {props.pop('cls', '')}".strip()
         text = props.pop("text", "")
         material_icon = props.pop("material_icon", None)
         contents = props.pop("contents", [])
+        props["class"] = "btn"
 
         # Initialize with combined class and remaining props
-        super().__init__("button", cls=cls, **props)
+        super().__init__("button", **props)
 
         # Handle material icon if specified
         if material_icon:

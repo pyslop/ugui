@@ -4,7 +4,8 @@ from ugui.html import Element
 
 class Card(Component):
     def __init__(self, **props):
-        super().__init__("div", cls=f"card {props.get('class', '')}".strip(), **props)
+        props["class"] = "card"
+        super().__init__("div", **props)
 
         # Initialize section elements
         self._header = Element("div", cls="card-header")

@@ -3,7 +3,8 @@ from . import Component, Element
 
 class Hero(Component):
     def __init__(self, **props):
-        super().__init__("div", cls=f"hero {props.get('class', '')}".strip(), **props)
+        props["class"] = "hero"
+        super().__init__("div", **props)
         # Initialize section elements
         self._title = Element("h1", cls="hero-title")
         self._subtitle = Element("p", cls="hero-subtitle")

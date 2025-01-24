@@ -5,11 +5,11 @@ from ugui.html import Element
 
 class Box(Component):
     def __init__(self, **props):
-        cls = f"box {props.pop('class', '')} {props.pop('cls', '')}".strip()
         material_icon = props.pop("material_icon", None)
         icon_size = props.pop("icon_size", "2.5rem")
+        props["class"] = f"box"
 
-        super().__init__("div", cls=cls, **props)
+        super().__init__("div", **props)
 
         # Create container for content
         self.content_box = Element("div", cls="box-content")

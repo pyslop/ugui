@@ -11,10 +11,11 @@ class Link(Component):
         material_icon = props.pop("material_icon", None)
         icon_position = props.pop("icon_position", "left")
         icon_size = props.pop("icon_size", "1.8rem")
-        cls = f"link {props.pop('class', '')} {props.pop('cls', '')}".strip()
+        # cls = f"link {props.pop('class', '')} {props.pop('cls', '')}".strip()
+        props["class"] = "link"
 
         # Initialize with link attributes
-        super().__init__("a", href=url, cls=cls, **props)
+        super().__init__("a", href=url, **props)
 
         # Add text content first in a span
         text_span = Element("span", cls="link-text")

@@ -6,10 +6,9 @@ class NavBar(Component):
     def __init__(self, **props):
         # Extract and prepare props
         direction = props.pop("direction", "row")
-        cls = f"nav {props.pop('class', '')}".strip()
-
+        props["class"] = "nav"
         # Initialize nav element
-        super().__init__("nav", cls=cls, **props)
+        super().__init__("nav", **props)
 
         # Create navigation list with proper orientation
         self.nav_list = Element("ul", cls=f"nav-items nav-{direction}")
