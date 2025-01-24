@@ -3,8 +3,6 @@ import warnings
 from typing import List, Optional, Union
 from .component import (
     BASE_CSS,
-    Component,
-    Card,
     Form,
     Button,
     Fieldset,
@@ -12,10 +10,14 @@ from .component import (
     NavBar,
     NavItem,
     Hero,
+    Grid,
+    Box,
+    Link,
+)
+from .components import (
+    Card,
+    Component,
     MaterialIcon,
-    Grid,  # Add these
-    Box,  # Add these
-    Link,  # Add this import
 )
 from .html import Element, TextNode, Document
 
