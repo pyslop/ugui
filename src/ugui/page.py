@@ -3,10 +3,10 @@ import warnings
 from typing import List, Optional, Union
 from .component import (
     BASE_CSS,
-    Box,
     Link,
 )
 from .components import (
+    Box,
     Button,
     Card,
     Component,
