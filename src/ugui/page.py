@@ -16,8 +16,13 @@ class Node:
         child.parent = self
         self.children.append(child)
 
-    def render(self) -> str:
-        return "".join(child.render() for child in self.children)
+    def render(
+        self, indent: int = 0, indent_size: int = 2, minify: bool = False
+    ) -> str:
+        parts = []
+        for child in self.children:
+            parts.append(child.render(indent, indent_size, minify))
+        return "".join(parts)
 
 
 class TextNode(Node):
@@ -26,12 +31,13 @@ class TextNode(Node):
         self.text = text
         self.raw = raw
 
-    def render(self) -> str:
-        # For raw text, return as-is
-        if self.raw:
-            return self.text
-        # For regular text, could add HTML escaping here if needed
-        return str(self.text)
+    def render(
+        self, indent: int = 0, indent_size: int = 2, minify: bool = False
+    ) -> str:
+        text = self.text if self.raw else str(self.text)
+        if not text.strip() or minify:
+            return text
+        return " " * indent + text
 
 
 class Element(Node):
@@ -89,16 +95,29 @@ class Element(Node):
         else:
             super().append(child)
 
-    def render(self) -> str:
+    def render(
+        self, indent: int = 0, indent_size: int = 2, minify: bool = False
+    ) -> str:
         attrs = "".join(
             f' {k}="{v}"' for k, v in self.attrs.items() if not isinstance(v, bool)
         )
         attrs += "".join(f" {k}" for k, v in self.attrs.items() if isinstance(v, bool))
 
-        if self._name.lower() in defaults.void_tags:
-            return f"<{self._name}{attrs}/>"
+        if minify:
+            if self._name.lower() in defaults.void_tags:
+                return f"<{self._name}{attrs}/>"
+            content = super().render(0, 0, True)
+            return f"<{self._name}{attrs}>{content}</{self._name}>"
 
-        return f"<{self._name}{attrs}>{super().render()}</{self._name}>"
+        spaces = " " * indent
+        if self._name.lower() in defaults.void_tags:
+            return f"{spaces}<{self._name}{attrs}/>\n"
+
+        content = super().render(indent + indent_size, indent_size, minify)
+        if not content.strip():
+            return f"{spaces}<{self._name}{attrs}></{self._name}>\n"
+
+        return f"{spaces}<{self._name}{attrs}>\n{content}{spaces}</{self._name}>\n"
 
     def __enter__(self):
         if self._page:
@@ -111,22 +130,25 @@ class Element(Node):
 
 
 class Document(Node):
-    def __init__(self):
+    def __init__(self, minify=True, indent_size: int = 2):
         super().__init__()
         self.doctype = "html"
         self.lang = "en"
         self.styles = CSSRegistry()
+        self.minify = minify
+        self.indent_size = indent_size
 
     def collect_styles(self) -> str:
         """Collect all styles and render them"""
-        if self.styles._styles:
-            return f"<style>{self.styles.render()}</style>"
-        return ""
+        if not self.styles._styles:
+            return ""
+        styles = self.styles.render(minify=self.minify)
+        if self.minify:
+            return f"<style>{styles}</style>"
+        return f"<style>\n  {styles}\n</style>"
 
     def render(self) -> str:
-        html = f"<!DOCTYPE {self.doctype}><html lang='{self.lang}'>"
-
-        # Find head element or create one
+        # Find or create head element
         head = next(
             (
                 child
@@ -144,8 +166,13 @@ class Document(Node):
         if styles:
             head.children.insert(0, TextNode(styles, raw=True))
 
-        # Render final HTML
-        return html + super().render() + "</html>"
+        if self.minify:
+            html = f"<!DOCTYPE {self.doctype}><html lang='{self.lang}'>"
+            return html + super().render(0, 0, True) + "</html>"
+
+        html = f"<!DOCTYPE {self.doctype}>\n<html lang='{self.lang}'>\n"
+        content = super().render(self.indent_size, self.indent_size, False)
+        return html + content + "</html>\n"
 
 
 class PageUI:
@@ -194,11 +221,11 @@ class PageUI:
 
 
 class Page:
-    def __init__(self):
-        self.document = Document()
+    def __init__(self, minify: bool = True):
+        self.document = Document(minify=minify)  # Pass minify directly
         self._current = self.document
         self._ui = None
-        # Initialize with base styles
+        # Initialize with base styles after minify is set
         self.style(BASE_CSS)
 
     @property

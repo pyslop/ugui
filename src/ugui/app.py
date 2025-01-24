@@ -9,18 +9,18 @@ class App(Quart):
         super().__init__(*args, **kwargs)
         self._pages = []
 
-    async def handle_page(self, func):
-        page = Page()
+    async def handle_page(self, func, minify=True):
+        page = Page(minify=minify)
         if inspect.iscoroutinefunction(func):
             await func(page)
         else:
             await sync_to_async(func)(page)
         return str(page)
 
-    def page(self, route):
+    def page(self, route, minify=True):
         def decorator(func):
             async def wrapper():
-                return await self.handle_page(func)
+                return await self.handle_page(func, minify=minify)
 
             self._pages.append((route, wrapper))
             return wrapper
