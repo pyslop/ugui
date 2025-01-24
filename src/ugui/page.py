@@ -3,10 +3,6 @@ import warnings
 from typing import List, Optional, Union
 from .component import (
     BASE_CSS,
-    Form,
-    Button,
-    Fieldset,
-    Field,
     NavBar,
     NavItem,
     Hero,
@@ -15,8 +11,12 @@ from .component import (
     Link,
 )
 from .components import (
+    Button,
     Card,
     Component,
+    Fieldset,
+    Field,
+    Form,
     MaterialIcon,
 )
 from .html import Element, TextNode, Document
