@@ -3,8 +3,6 @@ import warnings
 from typing import List, Optional, Union
 from .component import (
     BASE_CSS,
-    NavBar,
-    NavItem,
     Hero,
     Grid,
     Box,
@@ -18,6 +16,8 @@ from .components import (
     Field,
     Form,
     MaterialIcon,
+    NavBar,
+    NavItem,
 )
 from .html import Element, TextNode, Document
 
