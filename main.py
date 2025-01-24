@@ -73,9 +73,18 @@ def index(page: Page):
                 with card.body():
                     with page.ui.form(action="/login"):
                         with page.ui.fieldset(legend="Login Details"):
-                            page.ui.field("Username", name="username")
                             page.ui.field(
-                                "Password", input_type="password", name="password"
+                                "Username",
+                                name="username",
+                                placeholder="Enter your username",
+                                required=True,
+                            )
+                            page.ui.field(
+                                "Password",
+                                input_type="password",
+                                name="password",
+                                placeholder="Enter your password",
+                                required=True,
                             )
                         page.ui.button(
                             "Submit",
