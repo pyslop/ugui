@@ -324,7 +324,13 @@ class Document(Node):
         styles = self.styles.render(minify=self.minify)
         if self.minify:
             return f"<style>{styles}</style>"
-        return f"<style>\n  {styles}\n</style>"
+
+        # Indent the style tag content properly
+        indent = " " * self.indent_size
+        style_content = "\n".join(
+            f"{indent}{line}" for line in styles.split("\n") if line.strip()
+        )
+        return f"<style>\n{style_content}\n{indent+indent}</style>"
 
     def render(self) -> str:
         # Find or create head element
@@ -340,10 +346,38 @@ class Document(Node):
             head = Element("head")
             self.children.insert(0, head)
 
-        # Insert styles at start of head
+        # Get ordered head elements
+        meta_tags = []
+        title_tag = None
+        other_tags = []
+
+        # Group head elements by type
+        for child in head.children:
+            if isinstance(child, Element):
+                if child._name == "meta":
+                    meta_tags.append(child)
+                elif child._name == "title":
+                    title_tag = child
+                else:
+                    other_tags.append(child)
+
+        # Clear head contents for reordering
+        head.children = []
+
+        # Add meta tags first
+        head.children.extend(meta_tags)
+
+        # Add title if exists
+        if title_tag:
+            head.children.append(title_tag)
+
+        # Insert styles after title
         styles = self.collect_styles()
         if styles:
-            head.children.insert(0, TextNode(styles, raw=True))
+            head.children.append(TextNode(styles, raw=True))
+
+        # Add remaining tags
+        head.children.extend(other_tags)
 
         if self.minify:
             html = f"<!DOCTYPE {self.doctype}><html lang='{self.lang}'>"
