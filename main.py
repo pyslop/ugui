@@ -84,13 +84,14 @@ def index(page: Page):
                             title="Submit login form",  # Add tooltip
                         )
 
-                with card.footer():
+                with card.footer(material_icon="person_add"):
                     page.p("Don't have an account?")
                     # Icon on left (default)
                     page.ui.link(
                         "Sign Up",
                         "/signup",
-                        material_icon="person_add",
+                        material_icon="arrow_forward",
+                        icon_position="right",
                         title="Create a new account",  # Add tooltip
                     )
 

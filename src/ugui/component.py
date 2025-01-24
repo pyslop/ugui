@@ -88,7 +88,7 @@ class Card(Component):
 
         # Add material icon if specified
         if material_icon:
-            icon = MaterialIcon(name=material_icon, size="1.2rem", **props)
+            icon = MaterialIcon(name=material_icon, size="1.4rem", **props)
             self._header.children.insert(0, icon)
 
         return self._header
@@ -106,7 +106,7 @@ class Card(Component):
 
         # Add material icon if specified
         if material_icon:
-            icon = MaterialIcon(name=material_icon, size="1.2rem", **props)
+            icon = MaterialIcon(name=material_icon, size="1.4rem", **props)
             self._footer.children.insert(0, icon)
 
         return self._footer
@@ -130,6 +130,16 @@ class Card(Component):
             align-items: center;
             gap: 0.5rem;
         }
+        .card-header .material-icon {
+            color: #0066cc;
+            opacity: 0.9;
+            transition: transform 0.2s ease;
+            height: 1.4rem;
+        }
+        .card-header:hover .material-icon {
+            transform: scale(1.1);
+            opacity: 1;
+        }
         .card-body { padding: 1rem; }
         .card-footer {
             padding: 1rem;
@@ -138,6 +148,16 @@ class Card(Component):
             display: flex;
             align-items: center;
             gap: 0.5rem;
+        }
+        .card-footer .material-icon {
+            color: #0066cc;
+            opacity: 0.9;
+            transition: transform 0.2s ease;
+            height: 1.4rem;
+        }
+        .card-footer:hover .material-icon {
+            transform: scale(1.1);
+            opacity: 1;
         }
         """
 
