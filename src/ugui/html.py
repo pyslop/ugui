@@ -208,9 +208,13 @@ class TextNode(Node):
         self, indent: int = 0, indent_size: int = 2, minify: bool = False
     ) -> str:
         text = self.text if self.raw else str(self.text)
-        if not text.strip() or minify:
-            return text
-        return " " * indent + text
+        if minify:
+            return text.strip()
+
+        text = text.strip()
+        if not text:
+            return ""
+        return " " * indent + text + "\n"
 
 
 class Element(Node):
@@ -286,11 +290,13 @@ class Element(Node):
         if self._name.lower() in defaults.void_tags:
             return f"{spaces}<{self._name}{attrs}/>\n"
 
+        # Basic indentation rules
         content = super().render(indent + indent_size, indent_size, minify)
         if not content.strip():
             return f"{spaces}<{self._name}{attrs}></{self._name}>\n"
 
-        return f"{spaces}<{self._name}{attrs}>\n{content}{spaces}</{self._name}>\n"
+        content = content.rstrip()
+        return f"{spaces}<{self._name}{attrs}>\n{content}\n{spaces}</{self._name}>\n"
 
     def __enter__(self):
         if self._page:
