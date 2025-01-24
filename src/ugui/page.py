@@ -12,6 +12,9 @@ from .component import (
     NavBar,
     NavItem,
     Hero,
+    MaterialIcon,
+    Grid,  # Add these
+    Box,  # Add these
 )
 from .html import Element, TextNode, Document
 
@@ -64,9 +67,11 @@ class PageUI:
         self._init_component(component)
         return component(self._page)
 
-    def nav_item(self, label, url="#", icon=None):
+    def nav_item(self, label, url="#", icon=None, material_icon=None):
         """Create a navigation item"""
-        component = NavItem(label=label, url=url, icon=icon)
+        component = NavItem(
+            label=label, url=url, icon=icon, material_icon=material_icon
+        )
         self._init_component(component)
         if hasattr(self._page, "_current") and self._page._current._name == "ul":
             # If we're in a navbar context, append directly to current ul
@@ -78,6 +83,26 @@ class PageUI:
         """Create a hero component"""
         props = {"title": title, "subtitle": subtitle, "contents": contents, **kwargs}
         component = Hero(**props)
+        self._init_component(component)
+        return component(self._page)
+
+    def material_icon(
+        self, name: str, size: str = "24px", color: str = "currentColor", **props
+    ):
+        """Create a material icon component"""
+        component = MaterialIcon(name=name, size=size, color=color, **props)
+        self._init_component(component)
+        return component(self._page)
+
+    def grid(self, *contents, **kwargs):
+        """Create a grid component"""
+        component = Grid(contents=contents, **kwargs)
+        self._init_component(component)
+        return component(self._page)
+
+    def box(self, *contents, **kwargs):
+        """Create a box component"""
+        component = Box(contents=contents, **kwargs)
         self._init_component(component)
         return component(self._page)
 

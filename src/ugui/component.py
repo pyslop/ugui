@@ -1,6 +1,16 @@
-from abc import ABC, abstractmethod
-from typing import Any, Optional
-from .html import Element
+from pathlib import Path
+from abc import abstractmethod
+from typing import Any
+from .html import Element, TextNode
+
+
+def load_svg(name: str) -> str:
+    """Load an SVG file from the static/material-icons directory"""
+    base_dir = Path(__file__).parent
+    icon_path = base_dir / "static" / "material-icons" / f"{name}.svg"
+    if not icon_path.exists():
+        raise ValueError(f"Icon {name} not found at {icon_path}")
+    return icon_path.read_text()
 
 
 class Component(Element):
@@ -33,9 +43,6 @@ class Component(Element):
         return self
 
 
-from .component import Component
-
-
 class Card(Component):
     def __init__(self, **props):
         super().__init__("div", cls=f"card {props.get('class', '')}".strip(), **props)
@@ -63,11 +70,17 @@ class Card(Component):
             self._footer.append(self.props["footer"])
             self.append(self._footer)
 
-    def header(self):
+    def header(self, material_icon=None, **props):
         """Access the card header section"""
         if self._header not in self.children:
             self.children.insert(0, self._header)
         self._header._page = self._page
+
+        # Add material icon if specified
+        if material_icon:
+            icon = MaterialIcon(name=material_icon, size="1.2rem", **props)
+            self._header.children.insert(0, icon)
+
         return self._header
 
     def body(self):
@@ -75,11 +88,17 @@ class Card(Component):
         self._body._page = self._page
         return self._body
 
-    def footer(self):
+    def footer(self, material_icon=None, **props):
         """Access the card footer section"""
         if self._footer not in self.children:
             self.append(self._footer)
         self._footer._page = self._page
+
+        # Add material icon if specified
+        if material_icon:
+            icon = MaterialIcon(name=material_icon, size="1.2rem", **props)
+            self._footer.children.insert(0, icon)
+
         return self._footer
 
     def style(self) -> str:
@@ -88,21 +107,27 @@ class Card(Component):
             width: 100%;
             max-width: 100%;
             box-sizing: border-box;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            border: 0.0625rem solid #ddd;
+            border-radius: 0.25rem;
             margin: 1rem 0;
             overflow: hidden;
         }
         .card-header {
             padding: 1rem;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 0.0625rem solid #ddd;
             background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         .card-body { padding: 1rem; }
         .card-footer {
             padding: 1rem;
-            border-top: 1px solid #ddd;
+            border-top: 0.0625rem solid #ddd;
             background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         """
 
@@ -151,28 +176,52 @@ class Button(Component):
         # Extract and combine class names first
         cls = f"btn {props.pop('class', '')} {props.pop('cls', '')}".strip()
         text = props.pop("text", "")
+        material_icon = props.pop("material_icon", None)
+        contents = props.pop("contents", [])
 
         # Initialize with combined class and remaining props
         super().__init__("button", cls=cls, **props)
 
+        # Handle material icon if specified
+        if material_icon:
+            icon = MaterialIcon(name=material_icon, size="1.2rem")
+            self.append(icon)
+
         if text:
             self.append(text)
+        elif isinstance(contents, (list, tuple)):
+            for content in contents:
+                if isinstance(content, MaterialIcon):
+                    # Skip material icons in contents as they should be handled via material_icon prop
+                    continue
+                if content is not None:
+                    self.append(content)
+        elif contents is not None:
+            self.append(contents)
 
     def style(self) -> str:
         return """
         .btn {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
             padding: 0.5rem 1rem;
             background: #0066cc;
             color: white;
             text-decoration: none;
-            border-radius: 4px;
+            border-radius: 0.25rem;
             margin: 0.5rem;
+            border: none;
+            cursor: pointer;
         }
         .btn.secondary {
             background: transparent;
             border: 1px solid #0066cc;
             color: #0066cc;
+        }
+        .btn .material-icon {
+            margin-right: -0.25rem;
+            margin-left: -0.25rem;
         }
         """
 
@@ -202,9 +251,9 @@ class Fieldset(Component):
     def style(self) -> str:
         return """
         fieldset {
-            border: 1px solid #ddd;
+            border: 0.0625rem solid #ddd;
             padding: 1rem;
-            border-radius: 4px;
+            border-radius: 0.25rem;
             margin-bottom: 1rem;
         }
         legend {
@@ -255,8 +304,8 @@ class Field(Component):
             box-sizing: border-box;
             width: 100%;
             padding: 0.5rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            border: 0.0625rem solid #ddd;
+            border-radius: 0.25rem;
         }
         """
 
@@ -325,25 +374,33 @@ class NavBar(Component):
         }
         .nav-item:hover { color: #0066cc; }
         .nav-icon {
-            width: 1em;
-            height: 1em;
+            width: 0.8rem;
+            height: 1.75rem;
         }
         """
 
 
 class NavItem(Component):
     def __init__(self, **props):
-        # Keep label/url/icon from being passed to li element
+        # Keep special props from being passed to li element
         label = props.pop("label", "")
         url = props.pop("url", "#")
         icon = props.pop("icon", None)
+        material_icon = props.pop("material_icon", None)
 
         # Initialize li element
         super().__init__("li", **props)
 
         # Build link content
         a = Element("a", href=url, cls="nav-item")
-        if icon:
+
+        # Handle icon (either raw icon or material icon)
+        if material_icon:
+            icon_component = MaterialIcon(name=material_icon, size="1rem")
+            icon_span = Element("span", cls="nav-icon")
+            icon_span.append(icon_component)
+            a.append(icon_span)
+        elif icon:
             icon_span = Element("span", cls="nav-icon")
             icon_span.append(icon)
             a.append(icon_span)
@@ -415,8 +472,126 @@ class Hero(Component):
         """
 
 
+class MaterialIcon(Component):
+    def __init__(self, **props):
+        name = props.pop("name", "")
+        size = props.pop("size", "1.5rem")  # Changed default from 24px to 1.5rem
+        color = props.pop("color", "currentColor")
+
+        # Load SVG content
+        svg_content = load_svg(name)
+
+        # Initialize as span container
+        super().__init__("span", cls=f"material-icon icon-{name}", **props)
+
+        # Add SVG with styling
+        self.append(
+            TextNode(
+                svg_content.replace(
+                    "<svg",
+                    f'<svg style="width: {size}; height: {size}; fill: {color}"',
+                    1,
+                ),
+                raw=True,
+            )
+        )
+
+    def style(self) -> str:
+        return """
+        .material-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+        }
+        .material-icon svg {
+            display: block;
+        }
+        """
+
+
+class Grid(Component):
+    def __init__(self, **props):
+        cls = f"grid {props.pop('class', '')} {props.pop('cls', '')}".strip()
+        cols = props.pop("cols", "auto-fit")
+        min_width = props.pop("min_width", "250px")
+        gap = props.pop("gap", "1rem")
+
+        super().__init__("div", cls=cls, **props)
+        self.cols = cols
+        self.min_width = min_width
+        self.gap = gap
+
+    def style(self) -> str:
+        return f"""
+        .grid {{
+            display: grid;
+            grid-template-columns: repeat({self.cols}, minmax({self.min_width}, 1fr));
+            gap: {self.gap};
+            width: 100%;
+            margin: 1rem 0;
+        }}
+        """
+
+
+class Box(Component):
+    def __init__(self, **props):
+        cls = f"box {props.pop('class', '')} {props.pop('cls', '')}".strip()
+        material_icon = props.pop("material_icon", None)
+        icon_size = props.pop("icon_size", "1.5rem")
+
+        super().__init__("div", cls=cls, **props)
+
+        # Create container for content
+        self.content_box = Element("div", cls="box-content")
+
+        # Handle material icon if specified
+        if material_icon:
+            icon = MaterialIcon(name=material_icon, size=icon_size)
+            icon_wrapper = Element("div", cls="box-icon")
+            icon_wrapper.append(icon)
+            self.append(icon_wrapper)
+
+        self.append(self.content_box)
+
+    def __enter__(self):
+        if self._page:
+            self._page._current = self.content_box
+            self.content_box._page = self._page
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self._page:
+            self._page._current = self.parent
+
+    def style(self) -> str:
+        return """
+        .box {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            background: #fff;
+            border-radius: 0.25rem;
+            box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
+        }
+        .box-icon {
+            flex: 0 0 auto;
+            color: #0066cc;
+        }
+        .box-content {
+            flex: 1;
+            min-width: 0;
+        }
+        """
+
+
 # Keep BASE_CSS for page-wide styles
 BASE_CSS = """
+:root {
+    font-size: 16pt;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -424,7 +599,7 @@ BASE_CSS = """
 }
 
 body { 
-    max-width: 800px; 
+    max-width: 1000px;  /* Changed back to px */
     margin: 0 auto;
     padding: 0.5rem;
     font-family: system-ui, sans-serif;
@@ -436,20 +611,23 @@ a { color: #0066cc; }
 
 .features { 
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));  /* Keep px for grid */
     gap: 2rem;
     margin: 2rem 0;
 }
-.feature { padding: 1rem; }
+.feature { 
+    padding: 1rem; 
+    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
+}
 
 .container {
     width: 100%;
-    max-width: 600px;
+    max-width: 800px;  /* Changed back to px */
     margin: 0 auto;
     padding: 0.5rem;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 640px) {  /* Changed back to px */
     .container { padding: 0.25rem; }
     body { padding: 0.25rem; }
 }
