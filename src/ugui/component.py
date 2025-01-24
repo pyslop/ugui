@@ -88,7 +88,9 @@ class Card(Component):
 
         # Add material icon if specified
         if material_icon:
-            icon = MaterialIcon(name=material_icon, size="1.4rem", **props)
+            icon = MaterialIcon(
+                name=material_icon, size="1.8rem", **props
+            )  # Changed from 1.4rem
             self._header.children.insert(0, icon)
 
         return self._header
@@ -106,7 +108,9 @@ class Card(Component):
 
         # Add material icon if specified
         if material_icon:
-            icon = MaterialIcon(name=material_icon, size="1.4rem", **props)
+            icon = MaterialIcon(
+                name=material_icon, size="1.8rem", **props
+            )  # Changed from 1.4rem
             self._footer.children.insert(0, icon)
 
         return self._footer
@@ -117,24 +121,25 @@ class Card(Component):
             width: 100%;
             max-width: 100%;
             box-sizing: border-box;
-            border: 0.0625rem solid #ddd;
+            border: 0.0625rem solid var(--color-border);
             border-radius: 0.25rem;
             margin: 1rem 0;
             overflow: hidden;
+            background: var(--color-bg);
         }
         .card-header {
             padding: 1rem;
-            border-bottom: 0.0625rem solid #ddd;
-            background: #f8f9fa;
+            border-bottom: 0.0625rem solid var(--color-border);
+            background: var(--color-bg-subtle);
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
         .card-header .material-icon {
-            color: #0066cc;
+            color: var(--color-primary);
             opacity: 0.9;
             transition: transform 0.2s ease;
-            height: 1.4rem;
+            height: 1.8rem;  /* Changed from 1.4rem */
         }
         .card-header:hover .material-icon {
             transform: scale(1.1);
@@ -143,17 +148,17 @@ class Card(Component):
         .card-body { padding: 1rem; }
         .card-footer {
             padding: 1rem;
-            border-top: 0.0625rem solid #ddd;
-            background: #f8f9fa;
+            border-top: 0.0625rem solid var(--color-border);
+            background: var(--color-bg-subtle);
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
         .card-footer .material-icon {
-            color: #0066cc;
+            color: var(--color-primary);
             opacity: 0.9;
             transition: transform 0.2s ease;
-            height: 1.4rem;
+            height: 1.8rem;  /* Changed from 1.4rem */
         }
         .card-footer:hover .material-icon {
             transform: scale(1.1);
@@ -214,7 +219,7 @@ class Button(Component):
 
         # Handle material icon if specified
         if material_icon:
-            icon = MaterialIcon(name=material_icon, size="1.2rem")
+            icon = MaterialIcon(name=material_icon, size="1.8rem")
             self.append(icon)
 
         if text:
@@ -236,8 +241,8 @@ class Button(Component):
             align-items: center;
             gap: 0.5rem;
             padding: 0.5rem 1rem;
-            background: #0066cc;
-            color: white;
+            background: var(--color-primary);
+            color: var(--color-bg);
             text-decoration: none;
             border-radius: 0.25rem;
             margin: 0.5rem;
@@ -245,32 +250,32 @@ class Button(Component):
             cursor: pointer;  /* Always show pointer for buttons */
             transition: all 0.2s ease;
             position: relative;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px var(--color-shadow);
             transform: translateY(0);
         }
         .btn:hover {
-            background: #0052a3;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            background: var(--color-primary-hover);
+            box-shadow: 0 4px 8px var(--color-shadow-hover);
             transform: translateY(-1px);
         }
         .btn:active {
             transform: translateY(1px);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 2px var(--color-shadow);
         }
         .btn.secondary {
             background: transparent;
-            border: 1px solid #0066cc;
-            color: #0066cc;
+            border: 1px solid var(--color-primary);
+            color: var(--color-primary);
             box-shadow: none;
         }
         .btn.secondary:hover {
-            background: rgba(0, 102, 204, 0.1);
-            border-color: #0052a3;
-            color: #0052a3;
-            box-shadow: 0 2px 4px rgba(0, 102, 204, 0.1);
+            background: var(--color-primary-bg);
+            border-color: var(--color-primary-hover);
+            color: var(--color-primary-hover);
+            box-shadow: 0 2px 4px var(--color-shadow);
         }
         .btn.secondary:active {
-            background: rgba(0, 102, 204, 0.2);
+            background: var(--color-primary-bg-hover);
             transform: translateY(1px);
             box-shadow: none;
         }
@@ -313,14 +318,17 @@ class Fieldset(Component):
     def style(self) -> str:
         return """
         fieldset {
-            border: 0.0625rem solid #ddd;
+            border: 0.0625rem solid var(--color-border);
             padding: 1rem;
             border-radius: 0.25rem;
             margin-bottom: 1rem;
+            background: var(--color-bg);
         }
         legend {
             padding: 0 0.5rem;
             font-weight: bold;
+            color: var(--color-text);
+            background: var(--color-bg);
         }
         """
 
@@ -361,13 +369,24 @@ class Field(Component):
         .form-field label {
             display: block;
             margin-bottom: 0.5rem;
+            color: var(--color-text);
         }
         .form-field input {
             box-sizing: border-box;
             width: 100%;
             padding: 0.5rem;
-            border: 0.0625rem solid #ddd;
+            border: 0.0625rem solid var(--color-border);
             border-radius: 0.25rem;
+            background: var(--color-bg);
+            color: var(--color-text);
+        }
+        .form-field input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 2px var(--color-primary-bg);
+        }
+        .form-field input::placeholder {
+            color: var(--color-text-secondary);
         }
         """
 
@@ -414,8 +433,8 @@ class NavBar(Component):
         .nav {
             width: 100%;
             padding: 1rem;
-            background: #fff;
-            border-bottom: 1px solid #eee;
+            background: var(--color-bg);
+            border-bottom: 0.0625rem solid var(--color-border);
         }
         .nav-items {
             display: flex;
@@ -429,15 +448,29 @@ class NavBar(Component):
         }
         .nav-item {
             text-decoration: none;
-            color: #333;
-            display: flex;
+            color: var(--color-text);
+            display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            transition: color 0.2s ease;
         }
-        .nav-item:hover { color: #0066cc; }
+        .nav-item:hover { 
+            color: var(--color-primary); 
+        }
+        .nav-item .material-icon {
+            opacity: 0.8;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+        .nav-item:hover .material-icon {
+            opacity: 1;
+            transform: scale(1.1);
+        }
         .nav-icon {
-            width: 0.8rem;
-            height: 1.2rem;
+            display: inline-flex;
+            width: 1.4rem;
+            height: 1.4rem;
         }
         """
 
@@ -458,7 +491,7 @@ class NavItem(Component):
 
         # Handle icon (either raw icon or material icon)
         if material_icon:
-            icon_component = MaterialIcon(name=material_icon, size="1.2rem")
+            icon_component = MaterialIcon(name=material_icon, size="1.4rem")
             icon_span = Element("span", cls="nav-icon")
             icon_span.append(icon_component)
             a.append(icon_span)
@@ -514,16 +547,17 @@ class Hero(Component):
         .hero {
             text-align: center;
             padding: 4rem 2rem;
-            background: #f8f9fa;
+            background: var(--color-bg-subtle);
             margin: 0;
         }
         .hero-title {
             font-size: 2.5rem;
             margin-bottom: 1rem;
+            color: var(--color-text);
         }
         .hero-subtitle {
             font-size: 1.25rem;
-            color: #666;
+            color: var(--color-text-secondary);
             margin-bottom: 2rem;
         }
         .hero-actions {
@@ -607,7 +641,7 @@ class Box(Component):
     def __init__(self, **props):
         cls = f"box {props.pop('class', '')} {props.pop('cls', '')}".strip()
         material_icon = props.pop("material_icon", None)
-        icon_size = props.pop("icon_size", "1.5rem")
+        icon_size = props.pop("icon_size", "1.8rem")  # Changed from 1.5rem
 
         super().__init__("div", cls=cls, **props)
 
@@ -640,13 +674,13 @@ class Box(Component):
             align-items: flex-start;
             gap: 1rem;
             padding: 1rem;
-            background: #fff;
+            background: var(--color-bg);
             border-radius: 0.25rem;
-            box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 1rem var(--color-shadow);
         }
         .box-icon {
             flex: 0 0 auto;
-            color: #0066cc;
+            color: var(--color-primary);
         }
         .box-content {
             flex: 1;
@@ -662,7 +696,7 @@ class Link(Component):
         url = props.pop("url", "#")
         material_icon = props.pop("material_icon", None)
         icon_position = props.pop("icon_position", "left")  # New prop for icon position
-        icon_size = props.pop("icon_size", "1.2rem")
+        icon_size = props.pop("icon_size", "1.8rem")
         # Remove icon position from class since we'll handle ordering with flex-order
         cls = f"link {props.pop('class', '')} {props.pop('cls', '')}".strip()
 
@@ -721,7 +755,55 @@ class Link(Component):
 # Keep BASE_CSS for page-wide styles
 BASE_CSS = """
 :root {
-    font-size: 16pt;
+    /* Base theme */
+    --font-size: 16pt;
+    --font-family: system-ui, sans-serif;
+    
+    /* Colors - Light theme defaults */
+    --color-primary: #0066cc;
+    --color-primary-hover: #0052a3;
+    --color-primary-bg: rgba(0, 102, 204, 0.1);
+    --color-primary-bg-hover: rgba(0, 102, 204, 0.2);
+    
+    --color-text: #333333;
+    --color-text-secondary: #666666;
+    
+    --color-bg: #ffffff;
+    --color-bg-subtle: #f8f9fa;
+    --color-bg-hover: #f0f0f0;
+    
+    --color-border: #dddddd;
+    --color-shadow: rgba(0, 0, 0, 0.1);
+    --color-shadow-hover: rgba(0, 0, 0, 0.15);
+
+    /* Tooltip colors */
+    --tooltip-bg: white;
+    --tooltip-border: #e6f0ff;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* Colors - Dark theme */
+        --color-primary: #66b3ff;
+        --color-primary-hover: #99ccff;
+        --color-primary-bg: rgba(102, 179, 255, 0.1);
+        --color-primary-bg-hover: rgba(102, 179, 255, 0.2);
+        
+        --color-text: #e0e0e0;
+        --color-text-secondary: #a0a0a0;
+        
+        --color-bg: #1a1a1a;
+        --color-bg-subtle: #2a2a2a;
+        --color-bg-hover: #333333;
+        
+        --color-border: #404040;
+        --color-shadow: rgba(0, 0, 0, 0.3);
+        --color-shadow-hover: rgba(0, 0, 0, 0.4);
+
+        /* Tooltip colors */
+        --tooltip-bg: #2a2a2a;
+        --tooltip-border: #404040;
+    }
 }
 
 * {
@@ -734,9 +816,12 @@ body {
     max-width: 1000px;  /* Changed back to px */
     margin: 0 auto;
     padding: 0.5rem;
-    font-family: system-ui, sans-serif;
+    font-family: var(--font-family);
+    font-size: var(--font-size);
     line-height: 1.5;
     overflow-x: hidden;
+    background: var(--color-bg);
+    color: var(--color-text);
 }
 
 .features { 
@@ -774,13 +859,13 @@ a[data-tooltip] {
     left: 50%;
     transform: translateX(-50%);
     padding: 0.5rem 1rem;
-    background: white;
-    color: #0066cc;
-    border: 1px solid #e6f0ff;
+    background: var(--tooltip-bg);
+    color: var(--color-primary);
+    border: 1px solid var(--tooltip-border);
     border-radius: 0.25rem;
     font-size: 0.875rem;
     white-space: nowrap;
-    box-shadow: 0 2px 4px rgba(0, 102, 204, 0.1);
+    box-shadow: 0 2px 4px var(--color-shadow);
     z-index: 1000;
     pointer-events: none;
     margin-bottom: 0.5rem;
@@ -793,7 +878,7 @@ a[data-tooltip] {
     left: 50%;
     transform: translateX(-50%);
     border: 0.5rem solid transparent;
-    border-top-color: white;
+    border-top-color: var(--tooltip-bg);
     margin-bottom: -0.5rem;
     z-index: 1000;
     pointer-events: none;

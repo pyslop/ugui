@@ -3,7 +3,7 @@ from ugui import App, Page
 app = App(__name__)
 
 
-@app.page("/", minify=False)
+@app.page("/", minify=True)
 def index(page: Page):
     with page.head():
         page.title("uGUI Demo")
