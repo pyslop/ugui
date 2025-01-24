@@ -1,7 +1,3 @@
-from .html import Element
-from .components import Component
-
-# Keep BASE_CSS for page-wide styles
 BASE_CSS = """
 :root {
     /* Base theme */
@@ -62,7 +58,7 @@ BASE_CSS = """
 }
 
 body { 
-    max-width: 1000px;  /* Changed back to px */
+    max-width: 1000px;
     margin: 0 auto;
     padding: 0.5rem;
     font-family: var(--font-family);
@@ -75,7 +71,7 @@ body {
 
 .features { 
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));  /* Keep px for grid */
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     gap: 2rem;
     margin: 2rem 0;
 }
@@ -86,7 +82,7 @@ body {
 
 .container {
     width: 100%;
-    max-width: 800px;  /* Changed back to px */
+    max-width: 800px;
     margin: 0 auto;
     padding: 0.5rem;
 }
@@ -95,7 +91,6 @@ body {
     position: relative;
 }
 
-/* Keep pointer cursor only on interactive elements */
 button[data-tooltip],
 a[data-tooltip] {
     cursor: pointer;
@@ -133,7 +128,7 @@ a[data-tooltip] {
     pointer-events: none;
 }
 
-@media (max-width: 640px) {  /* Changed back to px */
+@media (max-width: 640px) {
     .container { padding: 0.25rem; }
     body { padding: 0.25rem; }
 }

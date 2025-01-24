@@ -1,7 +1,7 @@
 from .html import defaults
 import warnings
 from typing import List, Optional, Union
-from .component import BASE_CSS
+from .components.base_css import BASE_CSS
 from .components import (
     Box,
     Button,
