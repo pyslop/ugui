@@ -6,9 +6,7 @@ app = App(__name__)
 @app.page("/", minify=False)
 def index(page: Page):
     with page.head():
-        page.title("µGUI Demo")
-        page.meta(charset="utf-8")
-        page.meta(name="viewport", content="width=device-width, initial-scale=1")
+        page.title("uGUI Demo")
 
     with page.body():
         # Navigation using material icons
@@ -18,7 +16,7 @@ def index(page: Page):
 
         # Hero section with material icons
         with page.ui.hero() as hero:
-            hero.title("µGUI Framework")
+            hero.title("uGUI Framework")
             hero.subtitle("A lightweight Python web framework for building UIs")
             with hero.content():
                 page.ui.button(

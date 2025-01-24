@@ -317,6 +317,14 @@ class Document(Node):
         self.minify = minify
         self.indent_size = indent_size
 
+        # Define default meta tags
+        self.default_meta = [
+            # Removed from list since we'll handle charset separately
+            {"name": "viewport", "content": "width=device-width, initial-scale=1"}
+        ]
+        # Keep charset separate to ensure it's always first
+        self.charset_meta = {"charset": "utf-8"}
+
     def collect_styles(self) -> str:
         """Collect all styles and render them"""
         if not self.styles._styles:
@@ -347,6 +355,7 @@ class Document(Node):
             self.children.insert(0, head)
 
         # Get ordered head elements
+        charset_tag = None
         meta_tags = []
         title_tag = None
         other_tags = []
@@ -354,7 +363,9 @@ class Document(Node):
         # Group head elements by type
         for child in head.children:
             if isinstance(child, Element):
-                if child._name == "meta":
+                if child._name == "meta" and "charset" in child.attrs:
+                    charset_tag = child
+                elif child._name == "meta":
                     meta_tags.append(child)
                 elif child._name == "title":
                     title_tag = child
@@ -364,19 +375,30 @@ class Document(Node):
         # Clear head contents for reordering
         head.children = []
 
-        # Add meta tags first
+        # Always add charset meta first
+        if not charset_tag:
+            charset_tag = Element("meta", **self.charset_meta)
+        head.children.append(charset_tag)
+
+        # Add remaining default meta tags if they don't exist
+        existing_meta = {tuple(sorted(meta.attrs.items())) for meta in meta_tags}
+        for meta_attrs in self.default_meta:
+            meta_key = tuple(sorted(meta_attrs.items()))
+            if meta_key not in existing_meta:
+                meta_tags.append(Element("meta", **meta_attrs))
+
+        # Add other meta tags
         head.children.extend(meta_tags)
 
-        # Add title if exists
+        # Rest of the head content
         if title_tag:
             head.children.append(title_tag)
 
-        # Insert styles after title
+        # Add styles
         styles = self.collect_styles()
         if styles:
             head.children.append(TextNode(styles, raw=True))
 
-        # Add remaining tags
         head.children.extend(other_tags)
 
         if self.minify:
