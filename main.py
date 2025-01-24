@@ -24,12 +24,14 @@ def index(page: Page):
                     href="#",
                     cls="primary",
                     material_icon="rocket_launch",
+                    title="Start building your first uGUI application",  # Add tooltip
                 )
                 page.ui.button(
                     "Learn More",
                     href="#",
                     cls="secondary",
                     material_icon="school",
+                    title="Read the documentation",  # Add tooltip
                 )
 
         # Features section using Grid and Box
@@ -79,12 +81,18 @@ def index(page: Page):
                             "Submit",
                             type="submit",
                             material_icon="send",
+                            title="Submit login form",  # Add tooltip
                         )
 
                 with card.footer():
                     page.p("Don't have an account?")
                     # Icon on left (default)
-                    page.ui.link("Sign Up", "/signup", material_icon="person_add")
+                    page.ui.link(
+                        "Sign Up",
+                        "/signup",
+                        material_icon="person_add",
+                        title="Create a new account",  # Add tooltip
+                    )
 
 
 app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=True)

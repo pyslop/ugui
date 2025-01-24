@@ -15,9 +15,19 @@ def load_svg(name: str) -> str:
 
 class Component(Element):
     def __init__(self, _name: str = "div", **props):
-        super().__init__(
-            _name, **{k: v for k, v in props.items() if k not in ["contents"]}
-        )
+        # Move title to data-tooltip and aria-label if present
+        if "title" in props:
+            tooltip = props.pop("title")
+            if tooltip is not None:
+                props["data-tooltip"] = tooltip
+                props["aria-label"] = tooltip
+
+        # Filter out None values from props
+        filtered_props = {
+            k: v for k, v in props.items() if k not in ["contents"] and v is not None
+        }
+
+        super().__init__(_name, **filtered_props)
         self.props = props
 
         # Initialize component styles
@@ -212,16 +222,48 @@ class Button(Component):
             border-radius: 0.25rem;
             margin: 0.5rem;
             border: none;
-            cursor: pointer;
+            cursor: pointer;  /* Always show pointer for buttons */
+            transition: all 0.2s ease;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transform: translateY(0);
+        }
+        .btn:hover {
+            background: #0052a3;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
+        }
+        .btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
         .btn.secondary {
             background: transparent;
             border: 1px solid #0066cc;
             color: #0066cc;
+            box-shadow: none;
+        }
+        .btn.secondary:hover {
+            background: rgba(0, 102, 204, 0.1);
+            border-color: #0052a3;
+            color: #0052a3;
+            box-shadow: 0 2px 4px rgba(0, 102, 204, 0.1);
+        }
+        .btn.secondary:active {
+            background: rgba(0, 102, 204, 0.2);
+            transform: translateY(1px);
+            box-shadow: none;
         }
         .btn .material-icon {
             margin-right: -0.25rem;
             margin-left: -0.25rem;
+            transition: transform 0.2s ease;
+        }
+        .btn:hover .material-icon {
+            transform: scale(1.1);
+        }
+        .btn:active .material-icon {
+            transform: scale(0.95);
         }
         """
 
@@ -693,6 +735,48 @@ body {
     max-width: 800px;  /* Changed back to px */
     margin: 0 auto;
     padding: 0.5rem;
+}
+
+[data-tooltip] {
+    position: relative;
+}
+
+/* Keep pointer cursor only on interactive elements */
+button[data-tooltip],
+a[data-tooltip] {
+    cursor: pointer;
+}
+
+[data-tooltip]:hover::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.5rem 1rem;
+    background: white;
+    color: #0066cc;
+    border: 1px solid #e6f0ff;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0, 102, 204, 0.1);
+    z-index: 1000;
+    pointer-events: none;
+    margin-bottom: 0.5rem;
+}
+
+[data-tooltip]:hover::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 0.5rem solid transparent;
+    border-top-color: white;
+    margin-bottom: -0.5rem;
+    z-index: 1000;
+    pointer-events: none;
 }
 
 @media (max-width: 640px) {  /* Changed back to px */
