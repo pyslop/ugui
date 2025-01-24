@@ -37,16 +37,24 @@ def index(page: Page):
         # Features section using Grid and Box
         with page.ui.grid(cols="auto-fit", min_width="350px", gap="2rem") as grid:
             features = [
-                ("code", "Simple API", "Build web UIs with pure Python"),
-                ("psychology", "Mental Context", "Keeps code and UI in the same place"),
                 (
-                    "rocket_launch",
-                    "Modern Stack",
-                    "Built on ASGI/Quart for high performance",
+                    "code",
+                    "Pragmatic",
+                    "Build web UIs with pure Python",
                 ),
                 (
-                    "javascript",
-                    "No JavaScript",
+                    "rocket_launch",
+                    "Modern",
+                    "Built on ASGI/Quart for async I/O",
+                ),
+                (
+                    "psychology",
+                    "Contextual",
+                    "Keeps code and UI in the same place",
+                ),
+                (
+                    "gesture",
+                    "Uncomplicated",
                     "No need to write or bundle JavaScript",
                 ),
             ]
