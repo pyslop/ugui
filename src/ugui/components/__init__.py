@@ -44,7 +44,8 @@ class Component(Element):
 
 
 from ugui.components.material_icon import MaterialIcon
+from ugui.components.button import Button
 from ugui.components.card import Card
 
 
-__all__ = ["Component", "Card", "MaterialIcon"]
+__all__ = ["Button", "Component", "Card", "MaterialIcon"]
