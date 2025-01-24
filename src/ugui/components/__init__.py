@@ -43,6 +43,7 @@ class Component(Element):
         return self
 
 
+from ugui.components.link import Link
 from ugui.components.material_icon import MaterialIcon
 from ugui.components.box import Box
 from ugui.components.button import Button
@@ -63,6 +64,7 @@ __all__ = [
     "Form",
     "Grid",
     "Hero",
+    "Link",
     "MaterialIcon",
     "NavBar",
     "NavItem",

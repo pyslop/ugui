@@ -1,10 +1,7 @@
 from .html import defaults
 import warnings
 from typing import List, Optional, Union
-from .component import (
-    BASE_CSS,
-    Link,
-)
+from .component import BASE_CSS
 from .components import (
     Box,
     Button,
@@ -15,6 +12,7 @@ from .components import (
     Form,
     Grid,
     Hero,
+    Link,
     MaterialIcon,
     NavBar,
     NavItem,
