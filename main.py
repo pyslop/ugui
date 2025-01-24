@@ -83,10 +83,8 @@ def index(page: Page):
 
                 with card.footer():
                     page.p("Don't have an account?")
-                    page.a(
-                        contents=[page.ui.material_icon("person_add"), "Sign Up"],
-                        href="/signup",
-                    )
+                    # Icon on left (default)
+                    page.ui.link("Sign Up", "/signup", material_icon="person_add")
 
 
 app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=True)

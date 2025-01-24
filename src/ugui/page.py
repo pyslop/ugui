@@ -15,6 +15,7 @@ from .component import (
     MaterialIcon,
     Grid,  # Add these
     Box,  # Add these
+    Link,  # Add this import
 )
 from .html import Element, TextNode, Document
 
@@ -103,6 +104,12 @@ class PageUI:
     def box(self, *contents, **kwargs):
         """Create a box component"""
         component = Box(contents=contents, **kwargs)
+        self._init_component(component)
+        return component(self._page)
+
+    def link(self, text, url="#", material_icon=None, **kwargs):
+        """Create a link component"""
+        component = Link(text=text, url=url, material_icon=material_icon, **kwargs)
         self._init_component(component)
         return component(self._page)
 
