@@ -10,44 +10,6 @@ def index(page: Page):
         page.meta(charset="utf-8")
         page.meta(name="viewport", content="width=device-width, initial-scale=1")
 
-        # Minimal CSS
-        with page.style():
-            page.raw(
-                """
-                body { 
-                    max-width: 800px; 
-                    margin: 0 auto; 
-                    padding: 1rem;
-                    font-family: system-ui, sans-serif;
-                    line-height: 1.5;
-                }
-                nav { margin-bottom: 2rem; }
-                .hero { margin: 2rem 0; text-align: center; }
-                .features { 
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                    gap: 2rem;
-                    margin: 2rem 0;
-                }
-                .feature { padding: 1rem; }
-                a { color: #0066cc; }
-                .btn {
-                    display: inline-block;
-                    padding: 0.5rem 1rem;
-                    background: #0066cc;
-                    color: white;
-                    text-decoration: none;
-                    border-radius: 4px;
-                    margin: 0.5rem;
-                }
-                .btn.secondary {
-                    background: transparent;
-                    border: 1px solid #0066cc;
-                    color: #0066cc;
-                }
-            """
-            )
-
     with page.body():
         with page.nav():
             page.a("µGUI", href="/")
@@ -66,17 +28,35 @@ def index(page: Page):
                     "Build web UIs with pure Python using an intuitive API",
                 ),
                 (
-                    "Respects developer's mental context",
+                    "Respects your mental context",
                     "Keeps code and ui in the same place",
                 ),
                 (
                     "Modern Stack",
                     "Built on ASGI/Quart for high performance",
                 ),
+                (
+                    "Writing JavaScript is optional",
+                    "No need to write or bundle JavaScript",
+                ),
             ]:
                 with page.div(cls="feature"):
                     page.h3(title)
                     page.p(desc)
+
+        with page.div(cls="container"):
+            page.ui.card(
+                page.p("This is a sample card with a title and footer"),
+                title="Sample Card",
+                footer="Card Footer",
+            )
+
+            with page.ui.form(action="/login"):
+                with page.ui.fieldset(legend="Login Details"):
+                    page.ui.field("Username", name="username"),
+                    page.ui.field("Password", input_type="password", name="password"),
+
+                page.button("Submit", type="submit", cls="btn")
 
 
 app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=True)
