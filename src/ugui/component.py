@@ -641,7 +641,7 @@ class Box(Component):
     def __init__(self, **props):
         cls = f"box {props.pop('class', '')} {props.pop('cls', '')}".strip()
         material_icon = props.pop("material_icon", None)
-        icon_size = props.pop("icon_size", "1.8rem")  # Changed from 1.5rem
+        icon_size = props.pop("icon_size", "2.5rem")  # Increased from 1.8rem
 
         super().__init__("div", cls=cls, **props)
 
@@ -672,19 +672,33 @@ class Box(Component):
         .box {
             display: flex;
             align-items: flex-start;
-            gap: 1rem;
-            padding: 1rem;
+            gap: 1.5rem;  /* Increased from 1rem */
+            padding: 1.5rem;  /* Increased from 1rem */
             background: var(--color-bg);
-            border-radius: 0.25rem;
+            border-radius: 0.5rem;  /* Increased from 0.25rem */
             box-shadow: 0 0 1rem var(--color-shadow);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 2rem var(--color-shadow-hover);
         }
         .box-icon {
             flex: 0 0 auto;
             color: var(--color-primary);
+            transition: transform 0.2s ease;
+        }
+        .box:hover .box-icon {
+            transform: scale(1.1);
+            color: var(--color-primary-hover);
         }
         .box-content {
             flex: 1;
             min-width: 0;
+        }
+        .box-content h3 {
+            margin-bottom: 0.5rem;
+            color: var(--color-primary);
         }
         """
 
