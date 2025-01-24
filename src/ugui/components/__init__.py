@@ -47,6 +47,7 @@ from ugui.components.material_icon import MaterialIcon
 from ugui.components.button import Button
 from ugui.components.card import Card
 from ugui.components.form import Field, Fieldset, Form
+from ugui.components.grid import Grid
 from ugui.components.hero import Hero
 from ugui.components.navbar import NavBar, NavItem
 
@@ -58,6 +59,7 @@ __all__ = [
     "Field",
     "Fieldset",
     "Form",
+    "Grid",
     "Hero",
     "MaterialIcon",
     "NavBar",

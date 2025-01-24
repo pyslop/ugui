@@ -3,7 +3,6 @@ import warnings
 from typing import List, Optional, Union
 from .component import (
     BASE_CSS,
-    Grid,
     Box,
     Link,
 )
@@ -14,6 +13,7 @@ from .components import (
     Fieldset,
     Field,
     Form,
+    Grid,
     Hero,
     MaterialIcon,
     NavBar,
