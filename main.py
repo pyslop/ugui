@@ -12,7 +12,7 @@ def index(page: Page):
 
     with page.body():
         # Navigation using new nav components
-        with page.ui.navbar():
+        with page.ui.navbar(direction="column"):
             page.ui.nav_item("Home", "/", icon="🏠")
             page.ui.nav_item("Docs", "/docs", icon="📚")
 

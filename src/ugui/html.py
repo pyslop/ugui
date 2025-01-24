@@ -335,9 +335,9 @@ class Document(Node):
             self.children.insert(0, head)
 
         # Insert styles at start of head
-        # styles = self.collect_styles()
-        # if styles:
-        #     head.children.insert(0, TextNode(styles, raw=True))
+        styles = self.collect_styles()
+        if styles:
+            head.children.insert(0, TextNode(styles, raw=True))
 
         if self.minify:
             html = f"<!DOCTYPE {self.doctype}><html lang='{self.lang}'>"

@@ -239,15 +239,40 @@ class Field(Component):
 
 class NavBar(Component):
     def __init__(self, **props):
-        super().__init__("nav", cls="nav", **props)
-        ul = Element("ul", cls="nav-items")
-        contents = self.props.get("contents", [])
+        # Extract and prepare props
+        direction = props.pop("direction", "row")
+        cls = f"nav {props.pop('class', '')}".strip()
+
+        # Initialize nav element
+        super().__init__("nav", cls=cls, **props)
+
+        # Create navigation list with proper orientation
+        self.nav_list = Element("ul", cls=f"nav-items nav-{direction}")
+        self.append(self.nav_list)
+
+        # Add contents to nav list instead of directly to nav
+        contents = props.get("contents", [])
         if isinstance(contents, (list, tuple)):
             for content in contents:
-                ul.append(content)
-        else:
-            ul.append(contents)
-        self.append(ul)
+                if content is not None:
+                    self.nav_list.append(content)
+        elif contents is not None:
+            self.nav_list.append(contents)
+        self.previous_context = None  # Store previous context
+
+    def __enter__(self):
+        if self._page:
+            # Store previous context
+            self.previous_context = self._page._current
+            # Set nav_list as current context
+            self._page._current = self.nav_list
+            self.nav_list._page = self._page
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self._page:
+            # Restore context to nav's parent
+            self._page._current = self.previous_context
 
     def style(self) -> str:
         return """
@@ -257,12 +282,15 @@ class NavBar(Component):
             background: #fff;
             border-bottom: 1px solid #eee;
         }
-        .nav-content {
+        .nav-items {
             display: flex;
-            align-items: center;
+            list-style: none;
+            padding: 0;
+            margin: 0;
             gap: 1rem;
-            max-width: 1200px;
-            margin: 0 auto;
+        }
+        .nav-items.nav-column {
+            flex-direction: column;
         }
         .nav-item {
             text-decoration: none;
@@ -271,9 +299,7 @@ class NavBar(Component):
             align-items: center;
             gap: 0.5rem;
         }
-        .nav-item:hover {
-            color: #0066cc;
-        }
+        .nav-item:hover { color: #0066cc; }
         .nav-icon {
             width: 1em;
             height: 1em;
@@ -283,11 +309,15 @@ class NavBar(Component):
 
 class NavItem(Component):
     def __init__(self, **props):
-        super().__init__("li", **props)
-        label = self.props.get("label")
-        url = self.props.get("url", "#")
-        icon = self.props.get("icon")
+        # Keep label/url/icon from being passed to li element
+        label = props.pop("label", "")
+        url = props.pop("url", "#")
+        icon = props.pop("icon", None)
 
+        # Initialize li element
+        super().__init__("li", **props)
+
+        # Build link content
         a = Element("a", href=url, cls="nav-item")
         if icon:
             icon_span = Element("span", cls="nav-icon")

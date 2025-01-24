@@ -68,6 +68,10 @@ class PageUI:
         """Create a navigation item"""
         component = NavItem(label=label, url=url, icon=icon)
         self._init_component(component)
+        if hasattr(self._page, "_current") and self._page._current._name == "ul":
+            # If we're in a navbar context, append directly to current ul
+            self._page._current.append(component)
+            return component
         return component(self._page)
 
     def hero(self, title=None, subtitle=None, *contents, **kwargs):
