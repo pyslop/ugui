@@ -127,8 +127,7 @@ class Page:
         if style is True:
             self.style(BASE_CSS)
         elif isinstance(style, str):
-            with self.head():
-                self.link(rel="stylesheet", href=style)
+            self.document.link_stylesheet(style)
 
     @property
     def ui(self) -> PageUI:

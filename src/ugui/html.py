@@ -323,6 +323,7 @@ class Document(Node):
         self.minify = minify
         self.styles_enabled = style
         self.indent_size = indent_size
+        self._link_stylesheets = []
 
         # Define default meta tags
         self.default_meta = [
@@ -331,6 +332,10 @@ class Document(Node):
         ]
         # Keep charset separate to ensure it's always first
         self.charset_meta = {"charset": "utf-8"}
+
+    def link_stylesheet(self, href: str) -> None:
+        """Add a link to an external stylesheet"""
+        self._link_stylesheets.append(href)
 
     def collect_styles(self) -> str:
         """Collect all styles and render them"""
@@ -407,6 +412,10 @@ class Document(Node):
         styles = self.collect_styles()
         if styles:
             head.children.append(TextNode(styles, raw=True))
+
+        # Add external stylesheets
+        for stylesheet in self._link_stylesheets:
+            head.children.append(Element("link", rel="stylesheet", href=stylesheet))
 
         head.children.extend(other_tags)
 
