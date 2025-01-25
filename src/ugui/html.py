@@ -309,12 +309,13 @@ class Element(Node):
 
 
 class Document(Node):
-    def __init__(self, minify=True, indent_size: int = 2):
+    def __init__(self, minify=True, style=True, indent_size: int = 2):
         super().__init__()
         self.doctype = "html"
         self.lang = "en"
         self.styles = CSSRegistry()
         self.minify = minify
+        self.styles_enabled = style
         self.indent_size = indent_size
 
         # Define default meta tags
@@ -327,6 +328,8 @@ class Document(Node):
 
     def collect_styles(self) -> str:
         """Collect all styles and render them"""
+        if not self.styles_enabled or not self.styles:
+            return ""
         if not self.styles._styles:
             return ""
         styles = self.styles.render(minify=self.minify)

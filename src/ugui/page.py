@@ -115,12 +115,13 @@ class PageUI:
 
 
 class Page:
-    def __init__(self, minify: bool = True):
-        self.document = Document(minify=minify)  # Pass minify directly
+    def __init__(self, minify: bool = True, style: bool = True):
+        self.document = Document(minify=minify, style=style)
         self._current = self.document
         self._ui = None
         # Initialize with base styles after minify is set
-        self.style(BASE_CSS)
+        if style is True:
+            self.style(BASE_CSS)
 
     @property
     def ui(self) -> PageUI:
