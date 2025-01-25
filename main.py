@@ -10,13 +10,8 @@ async def render_nav(page):
             "Features", "/features", material_icon="star", icon_color="auto"
         )
         page.ui.nav_item(
-            "Pricing", "/pricing", material_icon="attach_money", icon_color="auto"
-        )
-        page.ui.nav_item(
             "Docs", "/docs", material_icon="description", icon_color="auto"
         )
-        page.ui.nav_item("About", "/about", material_icon="info", icon_color="auto")
-        page.ui.nav_item("Contact", "/contact", material_icon="mail", icon_color="auto")
 
 
 async def render_hero(page):
