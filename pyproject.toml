@@ -13,6 +13,7 @@ quart-cors = "^0.8.0"
 hypercorn = "^0.17.3"
 click = "^8.1.8"
 asgiref = "^3.8.1"
+quart-compress = "^0.2.1"
 
 
 [tool.poetry.group.dev.dependencies]

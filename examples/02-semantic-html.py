@@ -1,6 +1,9 @@
 from ugui import App, Page
+from quart_compress import Compress
 
 app = App(__name__)
+compress = Compress()
+compress.init_app(app)
 
 
 async def render_header(page):
@@ -448,7 +451,7 @@ async def render_additional_sections(page):
 
 @app.page(
     "/",
-    minify=False,
+    minify=True,
     style="/static/css/pico/pico.min.css",
 )
 async def index(page: Page):
@@ -462,7 +465,7 @@ async def index(page: Page):
         )
         # Add script tags
         # page.script(src="js/minimal-theme-switcher.js")
-        # page.script(src="js/modal.js")
+        page.script(src="/static/js/modal.js")
 
     with page.body():
         await render_header(page)
@@ -487,4 +490,4 @@ async def index(page: Page):
                 )
 
 
-app.run()
+app.run(debug=False)
