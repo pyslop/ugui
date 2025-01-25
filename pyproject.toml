@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ugui"
-version = "0.0.3"
+version = "0.0.4"
 description = ""
 authors = ["Harshad Sharma <harshad@sharma.io>"]
 readme = "README.md"
