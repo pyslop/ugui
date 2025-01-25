@@ -6,7 +6,11 @@ app = App(__name__)
 async def render_nav(page):
     with page.ui.navbar(direction="row"):
         page.ui.nav_item("Home", "/", material_icon="home")
+        page.ui.nav_item("Features", "/features", material_icon="star")
+        page.ui.nav_item("Pricing", "/pricing", material_icon="attach_money")
         page.ui.nav_item("Docs", "/docs", material_icon="description")
+        page.ui.nav_item("About", "/about", material_icon="info")
+        page.ui.nav_item("Contact", "/contact", material_icon="mail")
 
 
 async def render_hero(page):
