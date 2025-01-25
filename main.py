@@ -58,7 +58,6 @@ async def render_features(page):
                 "No need to write or bundle JavaScript",
             ),
         ]
-
         for icon, title, desc in features:
             with page.ui.box(material_icon=icon):
                 page.h3(title)
@@ -68,7 +67,6 @@ async def render_features(page):
 async def render_card(page):
     with page.div(cls="container"):
         with page.ui.card() as card:
-
             with card.header(material_icon="account_circle"):
                 page.h3("Login")
 
@@ -94,7 +92,6 @@ async def render_card(page):
                         material_icon="send",
                         title="Submit login form",
                     )
-
             with card.footer(material_icon="person_add"):
                 page.p("Don't have an account?")
                 page.ui.link(
