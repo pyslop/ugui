@@ -98,7 +98,7 @@ async def render_card(page):
                         title="Submit login form",
                     )
             with card.footer(material_icon="person_add"):
-                page.p("Don't have an account?")
+                page.span("Don't have an account?")
                 page.ui.link(
                     "Sign Up",
                     "/signup",
