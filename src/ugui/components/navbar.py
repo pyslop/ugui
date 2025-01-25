@@ -1,3 +1,4 @@
+from ugui.utils.colors import colorhash
 from . import Component, Element
 from .material_icon import MaterialIcon
 
@@ -106,6 +107,8 @@ class NavItem(Component):
         icon = props.pop("icon", None)
         material_icon = props.pop("material_icon", None)
         icon_color = props.pop("icon_color", None)
+        if icon_color == "auto":
+            icon_color = colorhash(label)
 
         # Initialize li element
         super().__init__("li", **props)

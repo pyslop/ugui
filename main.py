@@ -40,27 +40,31 @@ async def render_features(page):
         features = [
             (
                 "code",
+                "hsl(200, 90%, 50%)",
                 "Pragmatic",
-                "Minimal boilerplate and easy to use",
+                "Gets job done",
             ),
             (
-                "rocket_launch",
+                "bolt",
+                "hsl(50, 90%, 50%)",
                 "Modern",
-                "Built on ASGI/Quart for async I/O",
+                "Built on ASGI/Quart",
             ),
             (
                 "psychology",
+                "hsl(300, 90%, 50%)",
                 "Contextual",
-                "Keeps code and UI in the same place",
+                "Colocate logic and interface",
             ),
             (
                 "code_off",
+                "hsl(100, 90%, 50%)",
                 "Uncomplicated",
-                "No need to write or bundle JavaScript",
+                "Built-in components",
             ),
         ]
-        for icon, title, desc in features:
-            with page.ui.box(material_icon=icon, icon_color="auto"):
+        for icon, color, title, desc in features:
+            with page.ui.box(material_icon=icon, icon_color=color):
                 page.h3(title)
                 page.p(desc)
 

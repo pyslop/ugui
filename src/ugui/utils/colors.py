@@ -21,7 +21,7 @@ def colorhash(text: str) -> str:
     start_hue = (0.314159265 + (len(text) * 0.1)) % 1.0
 
     # Generate hue with dual golden ratio influence
-    hue = ((start_hue + (hash_value * golden_ratio1 * golden_ratio2)) % 1.0) * 360
+    hue = ((start_hue + (hash_value * golden_ratio1 / golden_ratio2)) % 1.0) * 360
 
     # More varied saturation and lightness based on text characteristics
     saturation = 65 + ((hash_value + len(text)) % 25)  # 65-90%
