@@ -119,13 +119,16 @@ class PageUI:
 
 
 class Page:
-    def __init__(self, minify: bool = True, style: bool = True):
+    def __init__(self, minify: bool = True, style: bool | str = True):
         self.document = Document(minify=minify, style=style)
         self._current = self.document
         self._ui = None
         # Initialize with base styles after minify is set
         if style is True:
             self.style(BASE_CSS)
+        elif isinstance(style, str):
+            with self.head():
+                self.link(rel="stylesheet", href=style)
 
     @property
     def ui(self) -> PageUI:

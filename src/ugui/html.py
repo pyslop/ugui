@@ -309,7 +309,7 @@ class Element(Node):
 
 
 class Document(Node):
-    def __init__(self, minify=True, style=True, indent_size: int = 2):
+    def __init__(self, minify=True, style: bool | str = True, indent_size: int = 2):
         super().__init__()
         self.doctype = "html"
         self.lang = "en"
