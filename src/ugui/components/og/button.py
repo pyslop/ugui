@@ -3,9 +3,8 @@ from .material_icon import MaterialIcon
 
 
 class Button(Component):
-    def __init__(self, **props):
+    def __init__(self, text=None, **props):
         # Extract and combine class names first
-        text = props.pop("text", "")
         material_icon = props.pop("material_icon", None)
         contents = props.pop("contents", [])
         props["class"] = "btn"

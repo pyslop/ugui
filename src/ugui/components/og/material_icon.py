@@ -1,12 +1,12 @@
 from . import Component
 from pathlib import Path
 from ugui.html import TextNode
-from ..utils.colors import colorhash
+from ugui.utils.colors import colorhash
 
 
 def load_svg(name: str) -> str:
     """Load an SVG file from the static/material-icons directory"""
-    base_dir = Path(__file__).parent.parent
+    base_dir = Path(__file__).parent.parent.parent
     icon_path = base_dir / "static" / "material-icons" / f"{name}.svg"
     if not icon_path.exists():
         raise ValueError(f"Icon {name} not found at {icon_path}")

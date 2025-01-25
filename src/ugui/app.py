@@ -1,7 +1,7 @@
 from pathlib import Path
 from asgiref.sync import sync_to_async
 from quart import Quart, request, send_from_directory
-from .page import Page
+from .page import Page, PageUI
 import inspect
 
 
@@ -13,13 +13,21 @@ class App(Quart):
 
         super().__init__(*args, **kwargs)
         self._pages = []
+        self._ui = PageUI(None)  # Add UI instance
 
         # Override static url path if needed
         if "static_url_path" not in kwargs:
             self.static_url_path = "/static"
 
+    @property  # Change from method to property
+    def ui(self) -> PageUI:
+        """Access UI configuration"""
+        return self._ui
+
     async def handle_page(self, func, minify=True, style=True):
         page = Page(minify=minify, style=style)
+        # Set the same component pack as app
+        page.ui._component_pack = self._ui._component_pack
         if inspect.iscoroutinefunction(func):
             await func(page)
         else:

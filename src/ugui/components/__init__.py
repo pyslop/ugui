@@ -1,71 +1,31 @@
-from abc import abstractmethod
-from typing import Any
-from ugui.html import Element
+from importlib import import_module
+from typing import Dict, Type
+from .og import Component
+
+_component_packs: Dict[str, Dict[str, Type[Component]]] = {}
 
 
-class Component(Element):
-    def __init__(self, _name: str = "div", **props):
-        # Move title to data-tooltip and aria-label if present
-        if "title" in props:
-            tooltip = props.pop("title")
-            if tooltip is not None:
-                props["data-tooltip"] = tooltip
-                props["aria-label"] = tooltip
-
-        # Filter out None values from props
-        filtered_props = {
-            k: v for k, v in props.items() if k not in ["contents"] and v is not None
+def register_pack(name: str, module_path: str) -> None:
+    """Register a component pack by name and module path"""
+    try:
+        module = import_module(module_path)
+        _component_packs[name] = {
+            k.lower(): v
+            for k, v in module.__dict__.items()
+            if isinstance(v, type) and issubclass(v, Component) and v != Component
         }
-
-        super().__init__(_name, **filtered_props)
-        self.props = props
-
-        # Initialize component styles
-        contents = props.get("contents", [])
-        if isinstance(contents, (list, tuple)):
-            for content in contents:
-                if content is not None:
-                    self.append(content)
-        elif contents is not None:
-            self.append(contents)
-
-    @abstractmethod
-    def style(self) -> str:
-        """Return the CSS for this component"""
-        pass
-
-    def __call__(self, page: Any) -> Any:
-        """Make components callable for page context"""
-        self._page = page
-        if hasattr(page, "_current"):
-            self.parent = page._current
-            page._current.append(self)
-        return self
+    except ImportError as e:
+        raise ImportError(f"Could not load component pack {name!r}: {e}")
 
 
-from ugui.components.link import Link
-from ugui.components.material_icon import MaterialIcon
-from ugui.components.box import Box
-from ugui.components.button import Button
-from ugui.components.card import Card
-from ugui.components.form import Field, Fieldset, Form
-from ugui.components.grid import Grid
-from ugui.components.hero import Hero
-from ugui.components.navbar import NavBar, NavItem
+def get_component(pack: str, name: str) -> Type[Component]:
+    """Get a component class from a registered pack"""
+    if pack not in _component_packs:
+        raise ValueError(f"Component pack {pack!r} not found")
+    if name.lower() not in _component_packs[pack]:
+        raise ValueError(f"Component {name!r} not found in pack {pack!r}")
+    return _component_packs[pack][name.lower()]
 
 
-__all__ = [
-    "Box",
-    "Button",
-    "Component",
-    "Card",
-    "Field",
-    "Fieldset",
-    "Form",
-    "Grid",
-    "Hero",
-    "Link",
-    "MaterialIcon",
-    "NavBar",
-    "NavItem",
-]
+# Register built-in packs
+register_pack("og", "ugui.components.og")

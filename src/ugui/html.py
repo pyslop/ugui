@@ -340,6 +340,7 @@ class Document(Node):
     def collect_styles(self) -> str:
         """Collect all styles and render them"""
         if not self.styles_enabled or not self.styles:
+            print(">>> self.styles_enabled", self.styles_enabled)
             return ""
         if not self.styles._styles:
             return ""
