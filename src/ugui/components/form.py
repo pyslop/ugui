@@ -117,15 +117,18 @@ class Field(Component):
             display: block;
             margin-bottom: 0.5rem;
             color: var(--color-text);
+            font-size: 1rem;
         }
         .form-field input {
             box-sizing: border-box;
             width: 100%;
-            padding: 0.5rem;
+            padding: 0.75rem 1rem;
             border: 0.0625rem solid var(--color-border);
             border-radius: 0.25rem;
             background: var(--color-bg);
             color: var(--color-text);
+            font-size: 1rem;
+            line-height: 1.5;
         }
         .form-field input:focus {
             outline: none;
@@ -134,5 +137,6 @@ class Field(Component):
         }
         .form-field input::placeholder {
             color: var(--color-text-secondary);
+            font-size: 0.95rem;
         }
         """
