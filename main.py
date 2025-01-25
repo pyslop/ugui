@@ -39,10 +39,10 @@ async def render_features(page):
     with page.ui.grid(cols="auto-fit", min_width="350px", gap="2rem") as grid:
         features = [
             (
-                "code",
+                "scale",
                 "hsl(200, 90%, 50%)",
-                "Pragmatic",
-                "Gets job done",
+                "Lightweight",
+                "No bloat, linear payloads",
             ),
             (
                 "bolt",
