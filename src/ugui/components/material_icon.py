@@ -1,6 +1,7 @@
 from . import Component
 from pathlib import Path
 from ugui.html import TextNode
+from ..utils.colors import colorhash
 
 
 def load_svg(name: str) -> str:
@@ -17,6 +18,9 @@ class MaterialIcon(Component):
         name = props.pop("name", "")
         size = props.pop("size", "1.5rem")
         color = props.pop("color", "currentColor")
+
+        if color == "auto":
+            color = colorhash(name)
 
         # Combine classes properly
         base_class = f"material-icon icon-{name}"

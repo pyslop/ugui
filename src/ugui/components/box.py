@@ -7,6 +7,7 @@ class Box(Component):
     def __init__(self, **props):
         material_icon = props.pop("material_icon", None)
         icon_size = props.pop("icon_size", "2.5rem")
+        icon_color = props.pop("icon_color", None)
         props["class"] = f"box"
 
         super().__init__("div", **props)
@@ -16,7 +17,11 @@ class Box(Component):
 
         # Handle material icon if specified
         if material_icon:
-            icon = MaterialIcon(name=material_icon, size=icon_size)
+            icon = MaterialIcon(
+                name=material_icon,
+                size=icon_size,
+                color=icon_color,
+            )
             icon_wrapper = Element("div", cls="box-icon")
             icon_wrapper.append(icon)
             self.append(icon_wrapper)

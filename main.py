@@ -5,12 +5,18 @@ app = App(__name__)
 
 async def render_nav(page):
     with page.ui.navbar(direction="row"):
-        page.ui.nav_item("Home", "/", material_icon="home")
-        page.ui.nav_item("Features", "/features", material_icon="star")
-        page.ui.nav_item("Pricing", "/pricing", material_icon="attach_money")
-        page.ui.nav_item("Docs", "/docs", material_icon="description")
-        page.ui.nav_item("About", "/about", material_icon="info")
-        page.ui.nav_item("Contact", "/contact", material_icon="mail")
+        page.ui.nav_item("Home", "/", material_icon="home", icon_color="auto")
+        page.ui.nav_item(
+            "Features", "/features", material_icon="star", icon_color="auto"
+        )
+        page.ui.nav_item(
+            "Pricing", "/pricing", material_icon="attach_money", icon_color="auto"
+        )
+        page.ui.nav_item(
+            "Docs", "/docs", material_icon="description", icon_color="auto"
+        )
+        page.ui.nav_item("About", "/about", material_icon="info", icon_color="auto")
+        page.ui.nav_item("Contact", "/contact", material_icon="mail", icon_color="auto")
 
 
 async def render_hero(page):
@@ -59,7 +65,7 @@ async def render_features(page):
             ),
         ]
         for icon, title, desc in features:
-            with page.ui.box(material_icon=icon):
+            with page.ui.box(material_icon=icon, icon_color="auto"):
                 page.h3(title)
                 page.p(desc)
 

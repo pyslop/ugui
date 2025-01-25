@@ -93,6 +93,7 @@ class NavItem(Component):
         url = props.pop("url", "#")
         icon = props.pop("icon", None)
         material_icon = props.pop("material_icon", None)
+        icon_color = props.pop("icon_color", None)
 
         # Initialize li element
         super().__init__("li", **props)
@@ -102,7 +103,9 @@ class NavItem(Component):
 
         # Handle icon (either raw icon or material icon)
         if material_icon:
-            icon_component = MaterialIcon(name=material_icon, size="1.4rem")
+            icon_component = MaterialIcon(
+                name=material_icon, size="1.4rem", color=icon_color
+            )
             icon_span = Element("span", cls="nav-icon")
             icon_span.append(icon_component)
             a.append(icon_span)

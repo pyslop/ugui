@@ -68,10 +68,14 @@ class PageUI:
         self._init_component(component)
         return component(self._page)
 
-    def nav_item(self, label, url="#", icon=None, material_icon=None):
+    def nav_item(self, label, url="#", icon=None, material_icon=None, icon_color=None):
         """Create a navigation item"""
         component = NavItem(
-            label=label, url=url, icon=icon, material_icon=material_icon
+            label=label,
+            url=url,
+            icon=icon,
+            material_icon=material_icon,
+            icon_color=icon_color,
         )
         self._init_component(component)
         if hasattr(self._page, "_current") and self._page._current._name == "ul":
