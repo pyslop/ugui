@@ -27,7 +27,7 @@ class App(Quart):
 
         return decorator
 
-    def run(self, host="127.0.0.1", port=5000, debug=False, use_reloader=False):
+    def run(self, host="127.0.0.1", port=5000, debug=True, use_reloader=True):
         for route, func in self._pages:
             self.route(route)(func)
 
