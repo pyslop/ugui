@@ -110,6 +110,27 @@ async def render_card(page):
 async def index(page: Page):
     with page.head():
         page.title("uGUI Demo")
+        page.style(
+            """
+                .features { 
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+                    gap: 2rem;
+                    margin: 2rem 0;
+                }
+                .feature { 
+                    padding: 1rem; 
+                    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
+                }
+
+                .container {
+                    width: 100%;
+                    max-width: 800px;
+                    margin: 0 auto;
+                    padding: 0.5rem;
+                }
+                """
+        )
 
     with page.body():
         await render_nav(page)
