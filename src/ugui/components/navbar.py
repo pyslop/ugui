@@ -48,7 +48,8 @@ class NavBar(Component):
         }
         .nav-items {
             display: flex;
-            justify-content: space-between;
+            flex-wrap: wrap;
+            justify-content: flex-start;
             list-style: none;
             padding: 0;
             margin: 0;
@@ -57,6 +58,14 @@ class NavBar(Component):
         .nav-items.nav-column {
             flex-direction: column;
         }
+        @media (max-width: 768px) {
+            .nav-items {
+                flex-direction: column;
+            }
+            .nav-item {
+                width: 100%;
+            }
+        }
         .nav-item {
             text-decoration: none;
             color: var(--color-text);
@@ -64,9 +73,12 @@ class NavBar(Component):
             align-items: center;
             gap: 0.5rem;
             transition: color 0.2s ease;
+            padding: 0.5rem;
         }
         .nav-item:hover { 
             color: var(--color-primary); 
+            background: var(--color-bg-secondary);
+            border-radius: 0.25rem;
         }
         .nav-item .material-icon {
             opacity: 0.8;
