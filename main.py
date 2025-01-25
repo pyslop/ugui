@@ -41,7 +41,7 @@ async def render_features(page):
             (
                 "code",
                 "Pragmatic",
-                "Build web UIs with pure Python",
+                "Minimal boilerplate and easy to use",
             ),
             (
                 "rocket_launch",
@@ -54,7 +54,7 @@ async def render_features(page):
                 "Keeps code and UI in the same place",
             ),
             (
-                "gesture",
+                "code_off",
                 "Uncomplicated",
                 "No need to write or bundle JavaScript",
             ),
