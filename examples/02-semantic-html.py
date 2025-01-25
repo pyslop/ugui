@@ -37,14 +37,14 @@ async def render_preview_section(page):
                     type="text",
                     name="firstname",
                     placeholder="First name",
-                    aria__label="First name",
+                    aria_label="First name",
                     required=True,
                 )
                 page.input(
                     type="email",
                     name="email",
                     placeholder="Email address",
-                    aria__label="Email address",
+                    aria_label="Email address",
                     autocomplete="email",
                     required=True,
                 )
@@ -239,7 +239,7 @@ async def render_form_section(page):
                         id="valid",
                         name="valid",
                         placeholder="Valid",
-                        aria__invalid="false",
+                        aria_invalid="false",
                     )
                 with page.label("Invalid", for_="invalid"):
                     page.input(
@@ -247,7 +247,7 @@ async def render_form_section(page):
                         id="invalid",
                         name="invalid",
                         placeholder="Invalid",
-                        aria__invalid="true",
+                        aria_invalid="true",
                     )
                 with page.label("Disabled", for_="disabled"):
                     page.input(
@@ -366,7 +366,7 @@ async def render_modal_section(page):
         with page.article():
             with page.header():
                 page.button(
-                    aria__label="Close",
+                    aria_label="Close",
                     rel="prev",
                     data_target="modal-example",
                     onclick="toggleModal(event)",
@@ -441,9 +441,9 @@ async def render_additional_sections(page):
     with page.section(id="loading"):
         page.h2("Loading")
         # Create a truly empty article with only aria-busy attribute
-        with page.article(aria__busy="true"):
+        with page.article(aria_busy="true"):
             pass
-        page.button("Please wait…", aria__busy="true")
+        page.button("Please wait…", aria_busy="true")
 
 
 @app.page(

@@ -220,6 +220,8 @@ class TextNode(Node):
 class Element(Node):
     def __init__(self, _name: str, **attrs):
         super().__init__()
+        if defaults.remove_first_underscore and _name.startswith("_"):
+            _name = _name[1:]
         self._name = _name.lower()
 
         # Validate tag
@@ -236,8 +238,12 @@ class Element(Node):
         for k, v in attrs.items():
             if k == "cls" or k == "className":
                 k = "class"
+            elif k.endswith("_"):
+                k = k[:-1]
             elif "__" in k:
                 k = k.replace("__", "-")
+            elif "_" in k:
+                k = k.replace("_", "-")
             self.attrs[k] = v
 
         self._page = None
