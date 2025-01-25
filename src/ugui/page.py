@@ -6,10 +6,10 @@ from .components import get_component, _component_packs
 
 
 class PageUI:
-    def __init__(self, page: "Page"):
+    def __init__(self, page: "Page", component_pack: str = "og"):
         self._page = page
         self._initialized_components = set()
-        self._component_pack = "og"  # default pack
+        self._component_pack = component_pack  # Use passed component pack
 
     def use(self, pack_name: str) -> None:
         """Select which component pack to use"""
@@ -17,8 +17,6 @@ class PageUI:
 
     def __getattr__(self, name: str):
         """Dynamic component loading"""
-        from .components import get_component
-
         try:
             component_class = get_component(self._component_pack, name)
 
@@ -40,24 +38,33 @@ class PageUI:
 
 
 class Page:
-    def __init__(self, minify: bool = True, style: bool | str = True):
+    def __init__(
+        self, minify: bool = True, style: bool | str = True, component_pack: str = "og"
+    ):
         self.document = Document(minify=minify, style=style)
         self._current = self.document
         self._ui = None
         self._component_instances = {}
+        self._component_pack = component_pack
+        self._init_styles(style)
 
+    def _init_styles(self, style: bool | str) -> None:
         # Initialize with base styles
         if style is True:
             # First add BASE_CSS
-            from .components.og.base_css import BASE_CSS
+            from .components.base_css import BASE_CSS
 
             self.style(BASE_CSS)
 
             # Then add pack-specific base styles if any
             if self.ui._component_pack in _component_packs:
                 pack_module = _component_packs[self.ui._component_pack]
-                if "BASE_CSS" in pack_module:
-                    self.style(pack_module["BASE_CSS"])
+                print(f"Found component pack {self.ui._component_pack!r}")
+                if hasattr(pack_module, "BASE_CSS"):
+                    print(f"Adding base styles for {self.ui._component_pack!r}")
+                    self.style(pack_module.BASE_CSS)
+            else:
+                print(f"Component pack {self.ui._component_pack!r} not found")
         elif isinstance(style, str):
             self.document.link_stylesheet(style)
 
@@ -65,8 +72,13 @@ class Page:
     def ui(self) -> PageUI:
         """Access UI components builder"""
         if self._ui is None:
-            self._ui = PageUI(self)
+            self._ui = PageUI(self, component_pack=self._component_pack)
         return self._ui
+
+    def use(self, pack_name: str) -> None:
+        """Select which component pack to use"""
+        self._component_pack = pack_name
+        self._ui.use(pack_name)
 
     def __str__(self):
         return self.document.render()

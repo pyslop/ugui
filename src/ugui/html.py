@@ -340,20 +340,19 @@ class Document(Node):
     def collect_styles(self) -> str:
         """Collect all styles and render them"""
         if not self.styles_enabled or not self.styles:
-            print(">>> self.styles_enabled", self.styles_enabled)
             return ""
         if not self.styles._styles:
             return ""
+
         styles = self.styles.render(minify=self.minify)
         if self.minify:
             return f"<style>{styles}</style>"
 
-        # Indent the style tag content properly
+        # Indent the style tag content while preserving our sorting
         indent = " " * self.indent_size
-        style_content = "\n".join(
-            f"{indent}{line}" for line in styles.split("\n") if line.strip()
-        )
-        return f"<style>\n{style_content}\n{indent+indent}</style>"
+        style_lines = [line for line in styles.split("\n") if line.strip()]
+        style_content = "\n".join(f"{indent}{line}" for line in style_lines)
+        return f"<style>\n{style_content}\n</style>"
 
     def render(self) -> str:
         # Find or create head element

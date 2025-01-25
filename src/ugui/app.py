@@ -13,21 +13,23 @@ class App(Quart):
 
         super().__init__(*args, **kwargs)
         self._pages = []
-        self._ui = PageUI(None)  # Add UI instance
+        self._ui = PageUI(None, "og")  # Change default pack here
 
         # Override static url path if needed
         if "static_url_path" not in kwargs:
             self.static_url_path = "/static"
 
-    @property  # Change from method to property
+    @property
     def ui(self) -> PageUI:
         """Access UI configuration"""
         return self._ui
 
+    def use(self, pack_name: str) -> None:
+        """Select which component pack to use"""
+        self._ui.use(pack_name)
+
     async def handle_page(self, func, minify=True, style=True):
-        page = Page(minify=minify, style=style)
-        # Set the same component pack as app
-        page.ui._component_pack = self._ui._component_pack
+        page = Page(minify=minify, style=style, component_pack=self._ui._component_pack)
         if inspect.iscoroutinefunction(func):
             await func(page)
         else:
